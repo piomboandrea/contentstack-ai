@@ -543,6 +543,26 @@
     .ed-type{height:clamp(28px,4.6vh,40px)}
   }
   @media (max-width:767px) and (max-height:760px){.c6-viz{display:none}.c6-band{padding:14px 16px}}
+  /* gsm staand: niets valt nog weg; past het niet, dan scrolt de inhoud tussen boven- en onderbalk */
+  @media (max-width:767px){
+    .inner{top:var(--topH);bottom:var(--botH);padding-top:20px;padding-bottom:16px;overflow-y:auto;overscroll-behavior:contain}
+    .c5{grid-template-rows:repeat(4,max-content);row-gap:24px}
+    .c5-pg i:nth-child(n+3){display:none}
+    .s5 .vis{min-height:390px}
+    .s4 .vis{flex:none}
+    .c4{position:relative;inset:auto;grid-template-rows:auto auto}
+    .c4{gap:10px}
+    .c4-console{gap:6px}
+    .c4-who{display:none}
+    .c4-msg{padding:8px 12px}
+    .c4-bar{height:38px}
+    .c4-page{padding:12px 14px}
+    .c4-page.is-row .c4-p span{display:none}
+    .c4-page.is-row .c4-p{padding:8px 6px}
+    .c4-q:nth-of-type(n+2){display:none}
+    .c3-ab{overflow:hidden}
+    .inner{-webkit-mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 12px),transparent);mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 12px),transparent)}
+  }
   /* gsm liggend: compacte balken, de inhoud scrolt tussen boven- en onderbalk */
   @media (max-height:520px) and (orientation:landscape){
     :root{--pad:24px;--topH:60px;--botH:64px}
@@ -1074,6 +1094,9 @@
         G.set(msgs, { autoAlpha: 0, y: 16 });
         G.set(oks, { autoAlpha: 0 });
         G.set(faq, { autoAlpha: 0 });
+        /* gsm: past de pagina niet helemaal, dan schuift het beeld mee naar de FAQ */
+        const scr = vis.closest('.inner');
+        if (scr) scr.scrollTop = 0;
         copyIn(t, sc, 0);
         t.from(vis.querySelector('.c4-frame'), { autoAlpha: 0, y: 30, duration: .7, ease: 'power3.out' }, .3);
         t.to(msgs[0], { autoAlpha: 1, y: 0, duration: .4, ease: 'power3.out' }, 1);
@@ -1103,6 +1126,7 @@
         T = type(t, txs[1], S2, T + .3, .045) + .3;
         t.fromTo(oks[1], { autoAlpha: 0, x: -10 }, { autoAlpha: 1, x: 0, duration: .3 }, T);
         t.fromTo(faq, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: .7, ease: 'power3.out' }, T + .1);
+        if (scr) t.call(function () { const d = scr.scrollHeight - scr.clientHeight; if (d > 4) scr.scrollTo({ top: d, behavior: RM ? 'auto' : 'smooth' }); }, null, T + .2);
         t.from(qa(faq, '.c4-q, .c4-a'), { autoAlpha: 0, y: 12, duration: .4, stagger: .1 }, T + .3);
       }
     },
@@ -1155,6 +1179,8 @@
         T += 2.7;
         t.fromTo(lines[2], { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: .5, ease: 'power2.inOut' }, T);
         t.from(q('.c5-ok'), { autoAlpha: 0, y: 14, duration: .5, ease: 'power3.out' }, T + .4);
+        const scr = vis.closest('.inner');
+        if (scr) { scr.scrollTop = 0; t.call(function () { const d = scr.scrollHeight - scr.clientHeight; if (d > 4) scr.scrollTo({ top: d, behavior: RM ? 'auto' : 'smooth' }); }, null, T + .3); }
         t.from(q('.c5-chk circle'), { scale: 0, transformOrigin: '50% 50%', duration: .45, ease: 'back.out(2.5)' }, T + .7);
         t.fromTo(q('.c5-chk path'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: .45, ease: 'power2.out' }, T + 1);
       }
