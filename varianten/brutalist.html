@@ -1,0 +1,417 @@
+<!doctype html>
+<!--
+  Skill: brutalist-skill (Swiss Industrial Print, zonder zwart, mono, ruis of terminal-look). Spectrum: leuk en vernieuwend.
+  Concept "Reuzetype in bol-blauw": bol in affiche-modus. Eén doorlopend raster van 1 px lijnen (#D8D8D8, gap-techniek) verdeelt de pagina in genummerde vakken 01 tot 07, de titel in Produkt 900 vult de vouw, de 60% staat als bijna paginavullend cijfer in bol-blauw, de 3 stappen als drie kolommen met enorme cijfers, Medisana als één grote quote in Produkt light, partners als strakke tabel met logo, één zin en een pijl-link, FAQ als lijst met plus-tekens.
+  Keuzes: alle inhoud komt uit content.json; het ecosysteem-blok is een blauwe band zonder nummer tussen 04 en 05, de drie zinnen ervan staan als drie kolommen; de lange teksten (Medisana-verhaal, voetnoot, FAQ-antwoorden) zitten achter een plus-knop met aria-expanded; geel wordt één keer gebruikt, als markering onder "Volgende dag".
+  Overwogen alternatieven: de voorbeeldvragen van de selector als vier open vakken met het label "voorbeeld" (geschrapt om tekst te sparen), een reusachtige "4" bij de partners (geschrapt omdat het botst met de vaknummering), en een fullbleed raster tot aan de schermrand (geschrapt zodat de lijnen de 1200 px container van de schil volgen).
+-->
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bol fulfilmentpartners: brutalist-skill</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+.bolx-content{overflow-x:clip;padding-bottom:64px}
+.wrap{max-width:var(--bol-container);margin:0 auto;padding:0 16px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:where(a,button):focus-visible{outline:2px solid var(--bol-blue-action);outline-offset:2px}
+img{display:block;max-width:100%}
+p{margin:0}
+.laden{padding:48px 0;color:var(--bol-ink-medium)}
+
+/* raster: 1 px lijnen via gap + achtergrond */
+.blk,.anchor{scroll-margin-top:calc(var(--bol-header-h) + 8px)}
+.g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:1px;background:var(--bol-border);border:1px solid var(--bol-border);border-top:0}
+.blk-hero .g{border-top:1px solid var(--bol-border);margin-top:24px}
+.c{background:#fff;min-width:0;padding:20px;grid-column:span 12}
+@media (min-width:768px){
+  .c{padding:32px}
+  .s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}
+  .s7{grid-column:span 7}.s8{grid-column:span 8}.s9{grid-column:span 9}
+}
+.c-minimal{background:var(--bol-blue-minimal)}
+.scene{background:var(--bol-blue);color:#fff}
+
+/* typografie */
+.lbl{font:600 12px/16px var(--bol-font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--bol-ink-medium)}
+.scene .lbl{color:#fff}
+h1{margin:0;font:900 clamp(52px,10.5vw,150px)/.9 var(--bol-font-display);letter-spacing:-.035em;color:var(--bol-blue);overflow-wrap:anywhere;text-wrap:balance}
+h2{margin:0;font:900 clamp(34px,5.8vw,84px)/.95 var(--bol-font-display);letter-spacing:-.03em;color:var(--bol-blue);overflow-wrap:anywhere;text-wrap:balance}
+h3{margin:0;font:600 20px/28px var(--bol-font-body)}
+.intro{margin-top:24px;font:400 clamp(17px,1.5vw,21px)/1.5 var(--bol-font-body);max-width:58ch}
+.state{font:700 clamp(24px,2.8vw,40px)/1.15 var(--bol-font-display);letter-spacing:-.01em;max-width:26ch}
+.c-minimal .state{color:var(--bol-blue)}
+
+/* knoppen (bol) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border-radius:var(--bol-radius-2);font:600 14px/20px var(--bol-font-body);text-decoration:none;cursor:pointer;border:1px solid transparent;white-space:nowrap;transition:background-color .15s,box-shadow .15s}
+.btn svg{width:24px;height:24px;flex:none}
+.btn-p{background:var(--bol-blue-action);color:#fff}
+.btn-p:hover{background:var(--bol-blue-hover);box-shadow:var(--bol-shadow-2)}
+.btn-s{background:#fff;color:var(--bol-blue-action);border-color:var(--bol-blue-action)}
+.btn-s:hover{background:var(--bol-blue-minimal);box-shadow:var(--bol-shadow-2)}
+
+/* hero */
+.c.meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;padding:12px 20px}
+.c.meta a{color:var(--bol-blue-action);text-decoration:none}
+.c.meta a:hover{text-decoration:underline}
+.c.hero-title{padding:40px 20px 48px}
+.hero-copy{display:flex;flex-direction:column;justify-content:space-between;gap:32px}
+.hero-copy .intro{margin:0}
+.c.img{padding:0;position:relative;min-height:240px}
+.c.img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.c.idx{padding:0;display:grid;grid-template-columns:repeat(2,1fr);background:#fff}
+.ix{display:flex;flex-direction:column;gap:8px;padding:16px 20px;color:var(--bol-ink);text-decoration:none;border-right:1px solid var(--bol-border);border-bottom:1px solid var(--bol-border);transition:background-color .15s}
+.ix:hover{background:var(--bol-blue-minimal)}
+.ix b{font:300 32px/1 var(--bol-font-display);color:var(--bol-blue)}
+.ix:nth-child(2n){border-right:0}
+.ix:nth-last-child(-n+2){border-bottom:0}
+@media (min-width:768px){
+  .c.meta{padding:12px 32px}
+  .c.hero-title{padding:64px 32px 72px}
+  .c.img{min-height:300px}
+  .c.idx{grid-template-columns:repeat(4,1fr)}
+  .ix:nth-child(2n){border-right:1px solid var(--bol-border)}
+  .ix:nth-child(4n){border-right:0}
+  .ix:nth-last-child(-n+2){border-bottom:1px solid var(--bol-border)}
+  .ix:nth-last-child(-n+4){border-bottom:0}
+}
+@media (min-width:1024px){
+  .c.idx{grid-template-columns:repeat(7,1fr)}
+  .ix.fill{display:none}
+  .ix{border-bottom:0}
+  .ix:nth-child(4n){border-right:1px solid var(--bol-border)}
+  .ix:nth-child(7){border-right:0}
+}
+
+/* vaknummer + kop */
+.c.num{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:24px 20px 16px}
+.c.num b{font:300 clamp(64px,10vw,144px)/.85 var(--bol-font-display);letter-spacing:-.03em;color:var(--bol-blue)}
+.c.head{padding:16px 20px 40px}
+@media (min-width:768px){
+  .c.num{flex-direction:column;align-items:flex-start;padding:56px 32px}
+  .c.head{padding:56px 32px}
+}
+
+/* genummerde lijst in groot Graphik */
+.li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start}
+.li b{font:300 clamp(36px,3.4vw,52px)/.9 var(--bol-font-display);color:var(--bol-blue);min-width:2ch}
+.li p{font:600 clamp(19px,1.9vw,26px)/1.3 var(--bol-font-body);padding-top:.1em}
+
+/* drie stappen met enorme cijfers */
+.step{display:flex;flex-direction:column;justify-content:space-between;gap:24px;min-height:260px}
+.step b{font:900 clamp(96px,15vw,220px)/.85 var(--bol-font-display);letter-spacing:-.04em;color:var(--bol-blue)}
+.step h3{font-size:clamp(18px,1.6vw,22px);line-height:1.35;max-width:24ch}
+@media (min-width:768px){.step{min-height:360px}}
+
+/* voordelen */
+.usp{display:flex;flex-direction:column;gap:16px;min-height:200px}
+.usp svg{width:32px;height:32px;color:var(--bol-blue)}
+.usp h3{margin-top:auto}
+.usp p{font-size:16px;line-height:24px}
+.big h3{display:grid;gap:8px}
+.big .pre{font:600 14px/20px var(--bol-font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--bol-ink-medium)}
+.big .giant{font:900 clamp(112px,22vw,320px)/.85 var(--bol-font-display);letter-spacing:-.05em;color:var(--bol-blue);overflow-wrap:anywhere}
+.big .post{font:700 clamp(28px,4vw,56px)/1 var(--bol-font-display);letter-spacing:-.02em;color:var(--bol-blue)}
+.big p{margin-top:24px;font-size:clamp(16px,1.3vw,19px);line-height:1.5;max-width:44ch}
+@media (min-width:1024px){
+  .c.big{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);column-gap:48px;align-items:end}
+  .big p{margin:0 0 .4em}
+}
+
+/* openklappen */
+.acc{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;padding:0;border:0;background:none;font:600 clamp(17px,1.6vw,22px)/1.3 var(--bol-font-body);color:var(--bol-ink);text-align:left;cursor:pointer}
+.acc svg{flex:none;width:24px;height:24px;color:var(--bol-blue-action);transition:transform .2s}
+.acc[aria-expanded="true"] svg{transform:rotate(45deg)}
+.panel{margin-top:16px;max-width:70ch;font-size:16px;line-height:24px}
+.panel[hidden]{display:none}
+.panel:not([hidden]){animation:pin .25s ease}
+@keyframes pin{from{opacity:0;transform:translateY(-6px)}}
+.foot .acc{justify-content:flex-start;font-size:14px;line-height:20px;color:var(--bol-ink-medium)}
+.foot .panel{font-size:14px;line-height:20px;color:var(--bol-ink-medium)}
+
+/* bewijs */
+.quote{display:flex;flex-direction:column;justify-content:space-between;gap:32px}
+.quote blockquote{margin:0}
+.quote blockquote p{font:300 clamp(28px,3.6vw,54px)/1.12 var(--bol-font-display);letter-spacing:-.015em;color:var(--bol-blue);text-wrap:balance}
+.kpi{display:flex;flex-direction:column;gap:12px}
+.kpi b{font:700 clamp(36px,4.6vw,66px)/1.1 var(--bol-font-display);letter-spacing:-.02em;color:var(--bol-blue)}
+.kpi .mark{background:var(--bol-yellow);padding:.04em .16em;border-radius:var(--bol-radius-1);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.kpi small{font:400 16px/24px var(--bol-font-body);color:var(--bol-ink-medium)}
+.acts{display:flex;flex-direction:column;gap:24px}
+
+/* ecosysteem: blauwe band */
+.eco h2{color:#fff;font-weight:700;font-size:clamp(28px,4vw,56px)}
+.eco ol{list-style:none;margin:32px 0 0;padding:0;display:grid;gap:16px}
+.eco li{padding-top:16px;border-top:1px solid rgba(255,255,255,.45);font-size:clamp(16px,1.3vw,19px);line-height:1.5}
+@media (min-width:768px){.eco ol{grid-template-columns:repeat(3,1fr);gap:32px}}
+
+/* selector */
+.c.cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+
+/* partners: tabel */
+.row{display:grid;gap:16px;align-items:center;transition:box-shadow .15s}
+.row:hover{box-shadow:inset 0 0 0 2px var(--bol-blue-action)}
+.row img{height:40px;width:auto;max-width:160px;object-fit:contain}
+.row p{margin-top:4px;font-size:16px;line-height:24px;max-width:60ch}
+.arrow{display:inline-flex;align-items:center;gap:4px;font:600 14px/20px var(--bol-font-body);color:var(--bol-blue-action);text-decoration:none;white-space:nowrap}
+.arrow svg{width:24px;height:24px;transition:transform .15s}
+.arrow:hover{text-decoration:underline}
+.arrow:hover svg{transform:translateX(4px)}
+@media (min-width:768px){.row{grid-template-columns:200px minmax(0,1fr) auto;gap:32px}}
+
+/* vragen */
+.faq .acc{font-size:clamp(18px,1.9vw,26px)}
+.faq .panel{font-size:clamp(16px,1.3vw,18px);line-height:1.55}
+
+/* onthullen bij scrollen */
+.rv{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .acc svg,.arrow svg,.row,.ix,.btn{transition:none}
+  .panel:not([hidden]){animation:none}
+}
+</style>
+</head>
+<body>
+<script src="../bol-shell.js"></script>
+<main class="bolx-content" id="app">
+  <div class="wrap"><p class="laden">Inhoud laden</p></div>
+</main>
+<script>
+(function () {
+  'use strict';
+  var app = document.getElementById('app');
+  var base = (window.BolShell && window.BolShell.base) || '../';
+  var links = {};
+
+  /* vaklabels per blok-id (korte labels, de rest komt uit content.json) */
+  var SEC = {
+    groeiambities: 'Signalen',
+    'wat-doet': 'Wat een partner doet',
+    voordelen: 'Voordelen',
+    medisana: 'Bewijs',
+    selector: 'Selector',
+    partners: 'Partners',
+    faq: 'Vragen'
+  };
+
+  function svg(p) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+  }
+  var I = {
+    chev: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M9.793 16.707a1 1 0 0 1 0-1.414L13.086 12 9.793 8.707a1 1 0 0 1 1.414-1.414l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0" clip-rule="evenodd"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="currentColor" d="M11 5a1 1 0 1 1 2 0v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6z"/></svg>',
+    ext: svg('<path d="M7 17 17 7M9 7h8v8"/>'),
+    truck: svg('<rect x="3" y="6" width="11" height="10" rx="1.5"/><path d="M14 10h3.2L20 13v3h-6z"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/>'),
+    chart: svg('<path d="M5 19v-5M10 19V9M15 19v-8M20 19V5"/>'),
+    target: svg('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'),
+    scale: svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
+    globe: svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>')
+  };
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function url(u) {
+    if (typeof u === 'string' && u.indexOf('@links.') === 0) return links[u.slice(7)] || '#';
+    return u || '#';
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function sentences(t) {
+    var m = String(t || '').match(/[^.!?]+[.!?]+/g);
+    return m ? m.map(function (s) { return s.trim(); }) : [String(t || '')];
+  }
+  function btn(cta, cls) {
+    if (!cta) return '';
+    var ext = !!cta.extern;
+    return '<a class="btn ' + cls + '" href="' + esc(url(cta.url)) + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + '>' +
+      esc(cta.label) + (ext ? I.ext + '<span class="sr">(opent in een nieuw venster)</span>' : I.chev) + '</a>';
+  }
+  function img(b, cls, eager) {
+    if (!b || !b.src) return '';
+    return '<div class="c ' + cls + ' img"><img src="' + esc(base + b.src) + '" alt="' + esc(b.alt) + '"' + (eager ? '' : ' loading="lazy"') + '></div>';
+  }
+  function numCell(n, label) {
+    return '<div class="c s3 num"><b>' + pad(n) + '</b><span class="lbl">' + esc(label) + '</span></div>';
+  }
+  function headCell(id, title, intro, span) {
+    return '<div class="c ' + (span || 's9') + ' head"><h2 id="h-' + esc(id) + '">' + esc(title) + '</h2>' +
+      (intro ? '<p class="intro">' + esc(intro) + '</p>' : '') + '</div>';
+  }
+  function acc(id, label, body) {
+    return '<div><button class="acc" type="button" aria-expanded="false" aria-controls="' + id + '">' + esc(label) + I.plus + '</button>' +
+      '<div class="panel" id="' + id + '" hidden>' + body + '</div></div>';
+  }
+  function sec(b, inner, cls) {
+    return '<section class="blk ' + (cls || '') + '" id="' + esc(b.id) + '" aria-labelledby="h-' + esc(b.id) + '"><div class="g">' + inner + '</div></section>';
+  }
+
+  var R = {};
+
+  /* 00 hero: reuzetitel vult de vouw, daaronder intro, knop, beeld en de index 01 tot 07 */
+  R.hero = function (b, n, data) {
+    var secs = data.blokken.filter(function (x) { return SEC[x.id]; });
+    var idx = secs.map(function (x, i) {
+      return '<a class="ix" href="#' + esc(x.id) + '"><b>' + pad(i + 1) + '</b><span class="lbl">' + esc(SEC[x.id]) + '</span></a>';
+    }).join('') + '<span class="ix fill" aria-hidden="true"></span>';
+    var first = secs.length ? secs[0].id : '';
+    return sec(b,
+      '<div class="c meta"><span class="lbl">Partnerplatform</span><span class="lbl">Fulfilment partners</span>' +
+        '<a class="lbl" href="#' + esc(first) + '">' + pad(1) + ' tot ' + pad(secs.length) + '</a></div>' +
+      '<div class="c hero-title"><h1 id="h-' + esc(b.id) + '">' + esc(b.titel) + '</h1></div>' +
+      '<div class="c s5 hero-copy"><p class="intro">' + esc(b.intro) + '</p><div>' + btn(b.cta, 'btn-p') + '</div></div>' +
+      img(b.beeld, 's7', true) +
+      '<nav class="c idx" aria-label="Inhoud van deze pagina">' + idx + '</nav>',
+      'blk-hero');
+  };
+
+  /* 01 signalen: genummerde lijst in groot Graphik, slot als blauwe scene */
+  R.groeiambities = function (b, n) {
+    var items = (b.items || []).map(function (t, i) {
+      return '<div class="c s6 li rv"><b>' + pad(i + 1) + '</b><p>' + esc(t) + '</p></div>';
+    }).join('');
+    var slot = b.slot ? '<div class="c scene rv"><p class="state">' + esc(b.slot) + '</p></div>' : '';
+    return sec(b, numCell(n, SEC[b.id]) + headCell(b.id, b.titel, b.intro) + items + slot);
+  };
+
+  /* 02 wat een partner doet: drie kolommen met enorme cijfers */
+  R['wat-doet'] = function (b, n, data) {
+    var steps = (b.stappen || []).map(function (s) {
+      return '<div class="c s4 step rv"><b>' + esc(s.nummer) + '</b><h3>' + esc(s.titel) + '</h3></div>';
+    }).join('');
+    var extra = (data.extraBeelden || [])[1];
+    var slot = b.slot ? '<div class="c s6 c-minimal rv"><p class="state">' + esc(b.slot) + '</p></div>' : '';
+    return sec(b, numCell(n, SEC[b.id]) + headCell(b.id, b.titel, b.intro) + steps + (extra ? img(extra, 's6 rv') : '') + slot);
+  };
+
+  /* 03 voordelen: vier vakken met icoon, dan de 60% als bijna paginavullend cijfer, voetnoot achter plus */
+  R.voordelen = function (b, n) {
+    var big = '', cards = '';
+    (b.items || []).forEach(function (it) {
+      if (it.cijfer != null) {
+        var key = it.cijfer + (it.eenheid || '') + '*';
+        var parts = String(it.titel).split(key);
+        var h = parts.length === 2
+          ? '<span class="pre">' + esc(parts[0].trim()) + '</span><span class="giant">' + esc(key) + '</span><span class="post">' + esc(parts[1].trim()) + '</span>'
+          : '<span class="post">' + esc(it.titel) + '</span>';
+        big = '<div class="c big rv"><h3>' + h + '</h3><p>' + esc(it.tekst) + '</p></div>';
+      } else {
+        cards += '<div class="c s3 usp rv">' + (I[it.icoon] || '') + '<h3>' + esc(it.titel) + '</h3><p>' + esc(it.tekst) + '</p></div>';
+      }
+    });
+    var foot = b.voetnoot ? '<div class="c foot rv">' + acc('p-voet', '* Over dit percentage', '<p>' + esc(b.voetnoot) + '</p>') + '</div>' : '';
+    return sec(b, numCell(n, SEC[b.id]) + headCell(b.id, b.titel, b.intro) + cards + big + foot);
+  };
+
+  /* 04 bewijs: één grote quote in Produkt light, levertijd voor en na, verhaal achter plus */
+  R.medisana = function (b, n) {
+    var q = '<div class="c s8 quote rv"><blockquote><p>“' + esc(b.quote) + '”</p></blockquote><span class="lbl">' + esc(b.quoteBron) + '</span></div>';
+    var voor = b.voor ? '<div class="c s6 kpi rv"><span class="lbl">' + esc(b.voor.label) + '</span><b>' + esc(b.voor.waarde) + '</b>' +
+      '<small>' + esc(b.voor.vanuit ? 'vanuit ' + b.voor.vanuit : '') + '</small></div>' : '';
+    var na = b.na ? '<div class="c s6 kpi rv"><span class="lbl">' + esc(b.na.label) + '</span><b><span class="mark">' + esc(b.na.waarde) + '</span></b>' +
+      '<small>' + esc(b.na['in'] ? 'in ' + b.na['in'] : '') + '</small></div>' : '';
+    var acts = '<div class="c acts rv">' + acc('p-medisana', 'Het verhaal in het kort', '<p>' + esc(b.tekst) + '</p>') + '<div>' + btn(b.cta, 'btn-s') + '</div></div>';
+    return sec(b, numCell(n, SEC[b.id]) + headCell(b.id, b.titel) + q + img(b.beeld, 's4 rv') + voor + na + acts);
+  };
+
+  /* ecosysteem: blauwe band zonder nummer, de zinnen als drie kolommen */
+  R.ecosysteem = function (b) {
+    var li = sentences(b.tekst).map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
+    return sec(b, '<div class="c scene eco rv"><h2 id="h-' + esc(b.id) + '">' + esc(b.titel) + '</h2><ol>' + li + '</ol></div>');
+  };
+
+  R['partner-selector'] = function (b) {
+    return '<div id="' + esc(b.id) + '" class="anchor"></div>';
+  };
+
+  /* 05 selector: drie genummerde zekerheden en de knop in een lichtblauw vak */
+  R.selector = function (b, n) {
+    var items = (b.items || []).map(function (t, i) {
+      return '<div class="c s4 li rv"><b>' + pad(i + 1) + '</b><p>' + esc(t) + '</p></div>';
+    }).join('');
+    var cta = '<div class="c c-minimal cta rv"><span class="lbl">Partner Selector</span>' + btn(b.cta, 'btn-p') + '</div>';
+    return sec(b, numCell(n, SEC[b.id]) + headCell(b.id, b.titel, b.tekst) + items + cta);
+  };
+
+  /* 06 partners: strakke tabel met logo, één zin en een pijl-link */
+  R.partners = function (b, n) {
+    var rows = (b.items || []).map(function (p) {
+      return '<div class="c row rv"><img src="' + esc(base + p.logo) + '" alt="' + esc('Logo van ' + p.naam) + '" loading="lazy">' +
+        '<div><h3>' + esc(p.naam) + '</h3><p>' + esc(p.tekst) + '</p></div>' +
+        '<a class="arrow" href="' + esc(p.url) + '">Meer over ' + esc(p.naam) + I.chev + '</a></div>';
+    }).join('');
+    return sec(b, numCell(n, SEC[b.id]) + headCell(b.id, b.titel, b.subtitel) + rows);
+  };
+
+  /* 07 vragen: lijst met plus-tekens die openklappen */
+  R.faq = function (b, n) {
+    var items = (b.items || []).map(function (q, i) {
+      var id = 'faq-' + i;
+      return '<div class="c faq rv"><h3><button class="acc" type="button" aria-expanded="false" aria-controls="' + id + '">' + esc(q.vraag) + I.plus + '</button></h3>' +
+        '<div class="panel" id="' + id + '"' + ' hidden><p>' + esc(q.antwoord) + '</p></div></div>';
+    }).join('');
+    return sec(b, numCell(n, SEC[b.id]) + headCell(b.id, b.titel, b.subtitel) + items);
+  };
+
+  /* onbekend bloktype: titel, intro en items, zodat niets wegvalt */
+  function generic(b) {
+    var items = (b.items || []).map(function (t) {
+      var txt = typeof t === 'string' ? t : (t.titel || t.naam || '');
+      return '<div class="c s6 li rv"><p>' + esc(txt) + '</p></div>';
+    }).join('');
+    return sec(b, headCell(b.id, b.titel || '', b.intro || b.tekst || '', 's12') + items);
+  }
+
+  function wire() {
+    app.addEventListener('click', function (e) {
+      var b = e.target.closest('.acc');
+      if (!b) return;
+      var open = b.getAttribute('aria-expanded') === 'true';
+      var p = document.getElementById(b.getAttribute('aria-controls'));
+      b.setAttribute('aria-expanded', open ? 'false' : 'true');
+      if (p) p.hidden = open;
+    });
+    var els = Array.prototype.slice.call(app.querySelectorAll('.rv'));
+    var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!('IntersectionObserver' in window) || still) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    els.forEach(function (el, i) {
+      el.style.transitionDelay = ((i % 4) * 60) + 'ms';
+      io.observe(el);
+    });
+  }
+
+  fetch(base + 'content.json')
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function (data) {
+      links = data.links || {};
+      var n = 0, html = '';
+      (data.blokken || []).forEach(function (b) {
+        if (SEC[b.id]) n += 1;
+        var fn = R[b.id] || generic;
+        html += fn(b, n, data);
+      });
+      app.innerHTML = '<div class="wrap">' + html + '</div>';
+      wire();
+    })
+    .catch(function (err) {
+      app.innerHTML = '<div class="wrap"><p class="laden">De inhoud kon niet laden. Open deze variant via http://localhost:8080/bol-skills/varianten/brutalist.html</p></div>';
+      if (window.console) console.error(err);
+    });
+})();
+</script>
+</body>
+</html>

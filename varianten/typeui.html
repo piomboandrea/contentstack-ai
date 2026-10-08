@@ -1,0 +1,566 @@
+<!doctype html>
+<!--
+  Skill: typeui-fundamentals (hierarchie, interactiewetten, typografie, WCAG). Spectrum: "Huidig, maar beter".
+  Concept "Huidig, helder": dezelfde blokken in dezelfde volgorde, maar met een leesroute van hero naar
+  "Herken je dit?" (zes echte checkboxes; vanaf twee vinkjes verschijnt een rustige nudge met de knop naar de
+  Partner Selector), dan de 3 stappen, de 5 voordelen met de 60% als ring, Medisana met voor en na, het
+  selector-blok als blauwe scene, de 4 partners en de FAQ als accordeon met aria-expanded.
+  Keuzes: een modulaire typeschaal 1.25 op basis 16 (16, 20, 25, 32, 40, 48), koppen met line-height 1 en 32 px
+  eronder, body op maximaal 60 tot 65 tekens per regel, een skip-link als eerste focusbaar element, zichtbare
+  focusring (2 px actieblauw, op de blauwe scene wit), knoppen 48 px, raaktargets minstens 44 px, lange tekst
+  (Medisana, voetnoot, FAQ) achter een disclosure, de sticky CTA onderaan op gsm en als kaart rechtsonder op
+  desktop, met sluitknop en verborgen zodra het selector-blok of de footer in beeld is (focus nooit bedekt).
+  Overwogen alternatieven: de situaties als klikbare chips met aria-pressed (minder herkenbaar dan een vinkje),
+  de hero in twee kolommen met bijgesneden beeld (risico op slechte crop van het 1600x573 banner),
+  de FAQ met details/summary (werkt, maar aria-expanded op een echte knop is explicieter voor de EAA-pitch).
+-->
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bol fulfilmentpartners: typeui-fundamentals</title>
+  <meta name="description" content="Ontdek Fulfilment Partners via bol, variant typeui-fundamentals: een heldere leesroute, toegankelijk volgens WCAG 2.2 AA.">
+  <style>
+    /* ---------- basis ---------- */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--bol-header-h, 152px) + 24px); }
+    html.has-stick { scroll-padding-bottom: 120px; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    .bolx-content { font: 400 16px/24px var(--bol-font-body); color: var(--bol-ink); }
+    #inhoud:focus { outline: none; }
+    img { max-width: 100%; height: auto; display: block; }
+    [hidden] { display: none !important; }
+    .wrap { max-width: var(--bol-container, 1200px); margin: 0 auto; padding: 0 16px; }
+    .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    [id] { scroll-margin-top: calc(var(--bol-header-h, 152px) + 24px); }
+
+    /* focus: systeemfeedback, overal gelijk, nooit geanimeerd */
+    :focus-visible { outline: 2px solid var(--bol-blue-action); outline-offset: 2px; }
+    .scene :focus-visible { outline-color: #fff; }
+
+    /* skip-link: eerste focusbaar element, zichtbaar bij focus boven de header */
+    .skip { position: absolute; left: 16px; top: -200px; z-index: 1000; background: var(--bol-blue); color: #fff; padding: 12px 20px; border-radius: 0 0 var(--bol-radius-2) var(--bol-radius-2); font: 600 16px/24px var(--bol-font-body); text-decoration: none; }
+    .skip:focus { top: 0; outline: 2px solid #fff; outline-offset: -5px; }
+
+    /* ---------- typografie: schaal 1.25 op basis 16 ---------- */
+    .h1 { font: 900 clamp(32px, 2rem + 1.4vw, 48px)/1 var(--bol-font-display); color: var(--bol-blue); margin: 0 0 32px; letter-spacing: -0.01em; max-width: 18ch; }
+    .h2 { font: 700 clamp(28px, 1.6rem + 1vw, 40px)/1 var(--bol-font-display); color: var(--bol-blue); margin: 0 0 32px; max-width: 24ch; }
+    .h2-sub { display: block; font: 400 20px/1.3 var(--bol-font-body); color: var(--bol-ink); margin-top: 8px; }
+    .h3 { font: 700 20px/1.2 var(--bol-font-display); color: var(--bol-blue); margin: 0 0 8px; }
+    .lead { font-size: 18px; line-height: 28px; max-width: 60ch; margin: 0 0 32px; }
+    @media (min-width: 768px) { .lead { font-size: 20px; line-height: 30px; } }
+    p { margin: 0 0 16px; max-width: 65ch; }
+    .eyebrow { font: 600 16px/24px var(--bol-font-body); color: var(--bol-blue-action); margin: 0 0 12px; }
+    .outro { margin: 32px 0 0; max-width: 60ch; }
+
+    /* ---------- knoppen (bol: 48 px, radius 8, semibold 14) ---------- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 24px; border-radius: var(--bol-radius-2); font: 600 14px/1 var(--bol-font-body); text-decoration: none; white-space: nowrap; flex-shrink: 0; cursor: pointer; border: 1px solid transparent; }
+    .btn svg { width: 16px; height: 16px; flex: 0 0 16px; }
+    .btn-p { background: var(--bol-blue-action); color: #fff; }
+    .btn-p:hover { background: var(--bol-blue-hover); box-shadow: var(--bol-shadow-2); }
+    .btn-s { background: #fff; color: var(--bol-blue-action); border-color: var(--bol-blue-action); }
+    .btn-s:hover { color: var(--bol-blue-hover); border-color: var(--bol-blue-hover); box-shadow: var(--bol-shadow-2); }
+    .btn-w { background: #fff; color: var(--bol-blue); }
+    .btn-w:hover { background: var(--bol-blue-minimal); box-shadow: var(--bol-shadow-2); }
+
+    /* ---------- secties en ritme ---------- */
+    .sec { padding: 56px 0; }
+    @media (min-width: 1024px) { .sec { padding: 96px 0; } }
+    .band-grey { background: var(--bol-grey); }
+    .band-blue { background: var(--bol-blue-minimal); }
+    .scene { background: var(--bol-blue); color: #fff; }
+    .scene .h2, .scene .h3 { color: #fff; }
+    .anchor { height: 0; }
+
+    /* laden en fout */
+    .state { padding: 48px 0; }
+    .state p { color: var(--bol-ink-medium); }
+
+    /* ---------- hero ---------- */
+    .hero { padding: 32px 0 56px; }
+    @media (min-width: 1024px) { .hero { padding: 48px 0 80px; } }
+    .hero .btn { margin-bottom: 40px; }
+    .hero-img { width: 100%; height: auto; border-radius: var(--bol-radius-4); background: var(--bol-blue-minimal); }
+    @media (min-width: 1024px) { .hero-img { border-radius: var(--bol-radius-6); } }
+
+    /* ---------- herken je dit: echte checkboxes ---------- */
+    .sits { border: 0; padding: 0; margin: 0; min-width: 0; }
+    .legend { padding: 0; float: left; width: 100%; }
+    .sits-g { display: grid; gap: 12px; clear: both; }
+    @media (min-width: 768px) { .sits-g { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+    @media (min-width: 1024px) { .sits-g { grid-template-columns: repeat(3, 1fr); } }
+    .sit { position: relative; display: flex; gap: 12px; align-items: flex-start; min-height: 72px; padding: 16px; background: #fff; border: 2px solid var(--bol-border); border-radius: var(--bol-radius-4); cursor: pointer; box-shadow: var(--bol-shadow-1); }
+    .sit:hover { border-color: var(--bol-blue-action); }
+    .sit-in { position: absolute; width: 1px; height: 1px; opacity: 0; margin: 0; pointer-events: none; }
+    .sit-box { flex: 0 0 24px; width: 24px; height: 24px; border: 2px solid var(--bol-blue); border-radius: var(--bol-radius-1); background: #fff; color: #fff; display: grid; place-items: center; }
+    .sit-box svg { width: 16px; height: 16px; opacity: 0; transform: scale(.6); transition: opacity .15s ease-out, transform .15s ease-out; }
+    .sit-txt { font-weight: 400; }
+    .sit.is-checked { border-color: var(--bol-blue-action); background: var(--bol-blue-minimal); }
+    .sit.is-checked .sit-box { background: var(--bol-blue-action); border-color: var(--bol-blue-action); }
+    .sit.is-checked .sit-box svg { opacity: 1; transform: none; }
+    .sit.is-checked .sit-txt { font-weight: 600; }
+    .sit:has(.sit-in:focus-visible) { outline: 2px solid var(--bol-blue-action); outline-offset: 2px; }
+    @supports not selector(:has(a)) { .sit:focus-within { outline: 2px solid var(--bol-blue-action); outline-offset: 2px; } }
+    .sits-c { margin: 16px 0 0; font-weight: 600; color: var(--bol-blue); min-height: 24px; }
+    .nudge { margin-top: 24px; padding: 24px; background: #fff; border: 2px solid var(--bol-blue-action); border-radius: var(--bol-radius-4); display: flex; flex-direction: column; gap: 16px; align-items: flex-start; opacity: 0; transform: translateY(8px); transition: opacity .2s ease-out, transform .2s ease-out; }
+    .nudge.is-on { opacity: 1; transform: none; }
+    .nudge-t { margin: 0; font: 700 20px/1.3 var(--bol-font-display); color: var(--bol-blue); max-width: 40ch; }
+    @media (min-width: 768px) { .nudge { flex-direction: row; align-items: center; justify-content: space-between; gap: 32px; } }
+
+    /* ---------- 3 stappen ---------- */
+    .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+    @media (min-width: 768px) { .steps { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+    .step { display: flex; flex-direction: column; gap: 16px; padding: 24px; background: #fff; border: 2px solid var(--bol-blue-low); border-radius: var(--bol-radius-4); }
+    .step-h { display: flex; align-items: center; justify-content: space-between; }
+    .step-n { font: 300 48px/1 var(--bol-font-display); color: var(--bol-blue); }
+    .step-ic { width: 48px; height: 48px; border-radius: 50%; background: var(--bol-blue-minimal); color: var(--bol-blue); display: grid; place-items: center; }
+    .step-t { font: 600 18px/26px var(--bol-font-body); }
+
+    /* ---------- voordelen ---------- */
+    .usps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+    @media (min-width: 768px) { .usps { grid-template-columns: repeat(2, 1fr); } .usp-big { grid-column: span 2; } }
+    @media (min-width: 1024px) { .usps { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+    .usp { background: #fff; border-radius: var(--bol-radius-4); padding: 24px; box-shadow: var(--bol-shadow-1); display: flex; flex-direction: column; gap: 24px; }
+    .usp p { margin: 0; }
+    .usp-ic { width: 48px; height: 48px; border-radius: 50%; background: var(--bol-blue-minimal); color: var(--bol-blue); display: grid; place-items: center; margin-bottom: 16px; }
+    .usp-big { border: 2px solid var(--bol-blue-low); }
+    @media (min-width: 600px) { .usp-big { flex-direction: row; align-items: center; gap: 32px; } }
+    .big { position: relative; width: 160px; height: 160px; flex: 0 0 160px; }
+    .ring { width: 100%; height: 100%; display: block; }
+    .big-n { position: absolute; inset: 0; display: grid; place-items: center; font: 300 44px/1 var(--bol-font-display); color: var(--bol-blue); }
+    .big-u { font-size: 24px; }
+
+    /* disclosure: tekst achter een klik */
+    .disc { margin-top: 24px; }
+    .disc-b { display: inline-flex; align-items: center; gap: 4px; min-height: 48px; padding: 0; background: none; border: 0; font: 600 16px/24px var(--bol-font-body); color: var(--bol-blue-action); cursor: pointer; text-align: left; }
+    .disc-b:hover { color: var(--bol-blue-hover); }
+    .disc-b svg { width: 24px; height: 24px; flex: 0 0 24px; transition: transform .2s ease-out; }
+    .disc-b[aria-expanded="true"] svg { transform: rotate(180deg); }
+    .disc-p { padding: 8px 0 0; }
+    .disc-p p { margin: 0; max-width: 65ch; }
+    .fn-t { font-size: 14px; line-height: 22px; color: var(--bol-ink); }
+
+    /* ---------- medisana ---------- */
+    .med { display: grid; gap: 40px; }
+    @media (min-width: 1024px) { .med { grid-template-columns: 7fr 5fr; gap: 64px; align-items: start; } }
+    .med-img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--bol-radius-6); background: var(--bol-blue-minimal); }
+    @media (max-width: 1023px) { .med-img { aspect-ratio: 16 / 10; } }
+    .quote { margin: 0 0 32px; padding: 4px 0 4px 20px; border-left: 4px solid var(--bol-blue-action); }
+    .quote p { font: 700 22px/30px var(--bol-font-display); color: var(--bol-blue); margin: 0 0 8px; max-width: 32ch; }
+    .quote-f { font: 600 14px/20px var(--bol-font-body); color: var(--bol-ink-medium); }
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: stretch; margin: 0 0 8px; }
+    @media (min-width: 600px) { .ba { gap: 16px; } }
+    .ba-t { padding: 16px; border: 2px solid var(--bol-border); border-radius: var(--bol-radius-4); background: #fff; }
+    .ba-t.na { background: var(--bol-blue-minimal); border-color: var(--bol-blue-action); }
+    .ba-l { font: 600 14px/20px var(--bol-font-body); color: var(--bol-ink-medium); margin: 0 0 8px; }
+    .ba-v { font: 700 24px/1.1 var(--bol-font-display); color: var(--bol-blue); margin: 0 0 4px; }
+    @media (min-width: 600px) { .ba-v { font-size: 28px; } }
+    .ba-s { font-size: 14px; line-height: 20px; margin: 0; }
+    .ba-a { display: grid; place-items: center; color: var(--bol-blue); }
+    .med .disc { margin: 0 0 32px; }
+    .med .btn { align-self: flex-start; }
+
+    /* ---------- ecosysteem: korte brug ---------- */
+    .eco { padding-bottom: 48px; }
+    @media (min-width: 1024px) { .eco { padding-bottom: 64px; } }
+    .bridge { font: 600 18px/28px var(--bol-font-body); color: var(--bol-blue); margin: 0; max-width: 60ch; }
+
+    /* ---------- selector-blok (blauwe scene) ---------- */
+    .sel { display: grid; gap: 40px; }
+    @media (min-width: 1024px) { .sel { grid-template-columns: 7fr 5fr; gap: 64px; align-items: center; } }
+    .checks { list-style: none; margin: 0 0 32px; padding: 0; display: grid; gap: 12px; max-width: 60ch; }
+    .checks li { display: flex; gap: 12px; align-items: flex-start; }
+    .chk { flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: #fff; color: var(--bol-blue); display: grid; place-items: center; }
+    .chk svg { width: 16px; height: 16px; }
+    .sel-img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--bol-radius-6); }
+
+    /* ---------- partners ---------- */
+    .parts { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+    @media (min-width: 600px) { .parts { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .parts { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+    .pcard { position: relative; display: flex; flex-direction: column; gap: 12px; background: #fff; border-radius: var(--bol-radius-4); padding: 24px; box-shadow: var(--bol-shadow-1); border: 2px solid transparent; }
+    .pcard:hover { border-color: var(--bol-blue-action); }
+    .pcard:has(.pcard-a:focus-visible) { outline: 2px solid var(--bol-blue-action); outline-offset: 2px; }
+    .pcard:has(.pcard-a:focus-visible) .pcard-a { outline: none; }
+    @supports not selector(:has(a)) { .pcard:focus-within { outline: 2px solid var(--bol-blue-action); outline-offset: 2px; } }
+    .plogo { height: 56px; display: flex; align-items: center; }
+    .plogo img { max-height: 44px; max-width: 150px; width: auto; height: auto; }
+    .pcard p { margin: 0; flex: 1; }
+    .pcard-a { display: inline-flex; align-items: center; gap: 2px; min-height: 48px; color: var(--bol-blue-action); font-weight: 600; text-decoration: none; }
+    .pcard-a svg { width: 24px; height: 24px; }
+    .pcard:hover .pcard-a { color: var(--bol-blue-hover); text-decoration: underline; }
+    .pcard-a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+
+    /* ---------- faq: accordeon met aria-expanded ---------- */
+    .faq { max-width: 800px; border-bottom: 1px solid var(--bol-border); }
+    .faq-i { border-top: 1px solid var(--bol-border); }
+    .faq-q { margin: 0; font: inherit; }
+    .faq-b { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; padding: 16px 4px; background: none; border: 0; text-align: left; font: 600 18px/26px var(--bol-font-body); color: var(--bol-blue); cursor: pointer; }
+    .faq-b:hover { color: var(--bol-blue-action); }
+    .faq-b svg { flex: 0 0 24px; width: 24px; height: 24px; transition: transform .2s ease-out; }
+    .faq-b[aria-expanded="true"] svg { transform: rotate(180deg); }
+    .faq-p { padding: 0 4px 24px; }
+    .faq-p p { margin: 0; max-width: 65ch; }
+
+    /* ---------- sticky CTA ---------- */
+    .stick { position: fixed; left: 0; right: 0; bottom: 0; z-index: 850; background: #fff; border-top: 1px solid var(--bol-border); box-shadow: var(--bol-shadow-2); padding: 12px 64px calc(12px + env(safe-area-inset-bottom)) 16px; transform: translateY(110%); opacity: 0; transition: transform .25s ease-out, opacity .25s ease-out; }
+    .stick.is-on { transform: none; opacity: 1; }
+    .stick-in { display: flex; flex-direction: column; gap: 6px; }
+    .stick-t { margin: 0; font: 600 14px/20px var(--bol-font-body); color: var(--bol-ink-medium); }
+    .stick .btn { width: 100%; }
+    .stick-x { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; border-radius: var(--bol-radius-2); color: var(--bol-ink); cursor: pointer; }
+    .stick-x:hover { background: var(--bol-grey); }
+    .stick-x svg { width: 24px; height: 24px; }
+    @media (min-width: 1024px) {
+      .stick { left: auto; right: 24px; bottom: 24px; width: 320px; border: 1px solid var(--bol-border); border-radius: var(--bol-radius-4); padding: 24px 24px 24px; transform: translateY(16px); }
+      .stick-in { gap: 12px; padding-right: 32px; }
+      .stick-t { padding-right: 8px; }
+    }
+
+    /* ---------- beweging: alleen transform en opacity, en uit bij reduced motion ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .stick { transform: none; }
+      .nudge { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <script src="../bol-shell.js"></script>
+  <main class="bolx-content" id="inhoud" tabindex="-1">
+    <div id="app" aria-busy="true">
+      <div class="wrap state"><p>Inhoud laden.</p></div>
+    </div>
+  </main>
+  <div id="stick-host"></div>
+  <a class="skip" id="skip" href="#inhoud">Naar de inhoud</a>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ---------- iconen: inline SVG, 24 px, currentColor, ronde lijnen ---------- */
+    var S = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">';
+    var F = '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true" focusable="false">';
+    var I = {
+      check: S + '<path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+      chevDown: F + '<path fill-rule="evenodd" d="M5.293 8.793a1 1 0 0 1 1.414 0L12 14.086l5.293-5.293a1 1 0 1 1 1.414 1.414l-6 6a1 1 0 0 1-1.414 0l-6-6a1 1 0 0 1 0-1.414" clip-rule="evenodd"/></svg>',
+      chevRight: F + '<path fill-rule="evenodd" d="M9.793 16.707a1 1 0 0 1 0-1.414L13.086 12 9.793 8.707a1 1 0 0 1 1.414-1.414l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0" clip-rule="evenodd"/></svg>',
+      arrow: S + '<path d="M4 12h15M13 6l6 6-6 6"/></svg>',
+      ext: S + '<path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>',
+      close: S + '<path d="M6 6l12 12M18 6L6 18"/></svg>',
+      truck: S + '<path d="M3 7a1 1 0 0 1 1-1h9v10H3zM13 10h4l3 3v3h-7z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></svg>',
+      chart: S + '<path d="M4 20h16M7 16v-4M12 16V7M17 16v-6"/></svg>',
+      target: S + '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 12h.01"/></svg>',
+      scale: S + '<path d="M12 4v16M5 20h14M5 8h14M5 8l-3 6a3 3 0 0 0 6 0zM19 8l-3 6a3 3 0 0 0 6 0z"/></svg>',
+      globe: S + '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>',
+      box: S + '<path d="M3 8l9-4 9 4v8l-9 4-9-4zM3 8l9 4 9-4M12 12v8"/></svg>',
+      back: S + '<path d="M9 14l-4-4 4-4M5 10h9a5 5 0 0 1 0 10h-3"/></svg>'
+    };
+
+    /* ---------- helpers ---------- */
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function sentences(t) {
+      var m = String(t || '').match(/[^.!?]+[.!?]+/g);
+      return m ? m.map(function (s) { return s.trim(); }) : [String(t || '').trim()];
+    }
+    function img(src) { return '../' + esc(src); }
+
+    var data = null;
+    var discN = 0;
+
+    function resolve(url) {
+      if (typeof url === 'string' && url.indexOf('@links.') === 0) return (data.links || {})[url.slice(7)] || '#';
+      return url || '#';
+    }
+    function btn(cta, cls) {
+      if (!cta) return '';
+      var ext = !!cta.extern;
+      return '<a class="btn ' + cls + '" href="' + esc(resolve(cta.url)) + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + '>' +
+        esc(cta.label) + (ext ? I.ext + '<span class="sr-only"> (opent in een nieuw venster)</span>' : '') + '</a>';
+    }
+    function disclosure(cls, label, inner) {
+      var id = 'disc-' + (++discN);
+      return '<div class="disc ' + cls + '"><button type="button" class="disc-b" aria-expanded="false" aria-controls="' + id + '" id="' + id + '-b">' +
+        esc(label) + I.chevDown + '</button><div class="disc-p" id="' + id + '" hidden>' + inner + '</div></div>';
+    }
+    function blok(id) {
+      var list = data.blokken || [];
+      for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+      return null;
+    }
+    function heroCta() { var h = blok('hero'); return h && h.cta; }
+
+    /* ---------- renderers per blok (id uit content.json) ---------- */
+    var R = {};
+
+    R.hero = function (b) {
+      var zinnen = sentences(b.intro);
+      var zin = zinnen[zinnen.length - 1];
+      return '<section class="hero" id="hero" aria-labelledby="h-hero"><div class="wrap">' +
+        '<h1 class="h1" id="h-hero">' + esc(b.titel) + '</h1>' +
+        '<p class="lead">' + esc(zin) + '</p>' +
+        btn(b.cta, 'btn-p') +
+        (b.beeld ? '<img class="hero-img" src="' + img(b.beeld.src) + '" alt="' + esc(b.beeld.alt) + '" width="' + (b.beeld.breedte || 1600) + '" height="' + (b.beeld.hoogte || 573) + '" fetchpriority="high">' : '') +
+        '</div></section>';
+    };
+
+    R.groeiambities = function (b) {
+      var items = (b.items || []).map(function (t, i) {
+        return '<label class="sit"><input class="sit-in" type="checkbox" name="situatie" value="' + i + '">' +
+          '<span class="sit-box" aria-hidden="true">' + I.check + '</span><span class="sit-txt">' + esc(t) + '</span></label>';
+      }).join('');
+      return '<section class="sec band-grey" id="groei" aria-labelledby="h-groei"><div class="wrap">' +
+        '<p class="eyebrow">Herken je dit?</p>' +
+        '<h2 class="h2" id="h-groei">' + esc(b.titel) + '</h2>' +
+        '<fieldset class="sits" id="sits"><legend class="lead legend">' + esc(b.intro) + '</legend><div class="sits-g">' + items + '</div></fieldset>' +
+        '<p class="sits-c" id="sits-c" aria-hidden="true"></p>' +
+        '<p class="sr-only" role="status" aria-atomic="true" id="sits-s"></p>' +
+        '<div class="nudge" id="nudge" hidden><p class="nudge-t">' + esc(b.slot) + '</p>' + btn(heroCta(), 'btn-p') + '</div>' +
+        '</div></section>';
+    };
+
+    R['wat-doet'] = function (b) {
+      var ic = [I.box, I.truck, I.back];
+      var li = (b.stappen || []).map(function (s, i) {
+        return '<li class="step"><span class="step-h"><span class="step-n" aria-hidden="true">' + esc(s.nummer) + '</span>' +
+          '<span class="step-ic" aria-hidden="true">' + (ic[i] || I.box) + '</span></span>' +
+          '<span class="step-t">' + esc(s.titel) + '</span></li>';
+      }).join('');
+      return '<section class="sec" id="wat-doet" aria-labelledby="h-wat"><div class="wrap">' +
+        '<h2 class="h2" id="h-wat">' + esc(b.titel) + '</h2><p class="lead">' + esc(b.intro) + '</p>' +
+        '<ol class="steps">' + li + '</ol>' +
+        (b.slot ? '<p class="outro">' + esc(b.slot) + '</p>' : '') +
+        '</div></section>';
+    };
+
+    R.voordelen = function (b) {
+      var cards = (b.items || []).map(function (it) {
+        var big = it.cijfer != null;
+        var vis = '';
+        if (big) {
+          var C = 2 * Math.PI * 52;
+          var on = C * Number(it.cijfer) / 100;
+          vis = '<div class="big" aria-hidden="true"><svg class="ring" viewBox="0 0 120 120">' +
+            '<circle cx="60" cy="60" r="52" fill="none" stroke="#D2E1FF" stroke-width="10"/>' +
+            '<circle cx="60" cy="60" r="52" fill="none" stroke="#0000FF" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + on.toFixed(1) + ' ' + (C - on).toFixed(1) + '" transform="rotate(-90 60 60)"/>' +
+            '</svg><span class="big-n">' + esc(it.cijfer) + '<span class="big-u">' + esc(it.eenheid || '') + '</span></span></div>';
+        }
+        return '<li class="usp' + (big ? ' usp-big' : '') + '">' + vis + '<div class="usp-b">' +
+          '<span class="usp-ic" aria-hidden="true">' + (I[it.icoon] || I.check) + '</span>' +
+          '<h3 class="h3">' + esc(it.titel) + '</h3><p>' + esc(it.tekst) + '</p></div></li>';
+      }).join('');
+      return '<section class="sec band-blue" id="voordelen" aria-labelledby="h-voordelen"><div class="wrap">' +
+        '<h2 class="h2" id="h-voordelen">' + esc(b.titel) + '</h2>' +
+        '<ul class="usps">' + cards + '</ul>' +
+        (b.voetnoot ? disclosure('fn', '* Over dit percentage', '<p class="fn-t">' + esc(b.voetnoot) + '</p>') : '') +
+        '</div></section>';
+    };
+
+    R.medisana = function (b) {
+      var voor = b.voor || {}, na = b.na || {};
+      return '<section class="sec" id="medisana" aria-labelledby="h-med"><div class="wrap med">' +
+        '<div class="med-c"><h2 class="h2" id="h-med">' + esc(b.titel) + '</h2>' +
+        '<blockquote class="quote"><p>' + esc(b.quote) + '</p><footer class="quote-f">' + esc(b.quoteBron) + '</footer></blockquote>' +
+        '<div class="ba" role="group" aria-label="Levertijd voor en na">' +
+          '<div class="ba-t"><p class="ba-l">' + esc(voor.label) + '</p><p class="ba-v">' + esc(voor.waarde) + '</p><p class="ba-s">vanuit ' + esc(voor.vanuit) + '</p></div>' +
+          '<span class="ba-a" aria-hidden="true">' + I.arrow + '</span>' +
+          '<div class="ba-t na"><p class="ba-l">' + esc(na.label) + '</p><p class="ba-v">' + esc(na.waarde) + '</p><p class="ba-s">in ' + esc(na['in']) + '</p></div>' +
+        '</div>' +
+        disclosure('med-d', 'Lees hoe Medisana dit aanpakte', '<p>' + esc(b.tekst) + '</p>') +
+        btn(b.cta, 'btn-s') +
+        '</div>' +
+        (b.beeld ? '<img class="med-img" src="' + img(b.beeld.src) + '" alt="' + esc(b.beeld.alt) + '" loading="lazy">' : '') +
+        '</div></section>';
+    };
+
+    R.ecosysteem = function (b) {
+      var s = sentences(b.tekst);
+      var brug = s.length > 2 ? s.pop() : '';
+      return '<section class="sec eco" id="ecosysteem" aria-labelledby="h-eco"><div class="wrap">' +
+        '<h2 class="h2" id="h-eco">' + esc(b.titel) + '</h2><p class="lead">' + esc(s.join(' ')) + '</p>' +
+        (brug ? '<p class="bridge">' + esc(brug) + '</p>' : '') +
+        '</div></section>';
+    };
+
+    R['partner-selector'] = function (b) {
+      return '<div id="' + esc(b.id) + '" class="anchor"></div>';
+    };
+
+    R.selector = function (b) {
+      var li = (b.items || []).map(function (t) {
+        return '<li><span class="chk" aria-hidden="true">' + I.check + '</span><span>' + esc(t) + '</span></li>';
+      }).join('');
+      var extra = (data.extraBeelden || [])[2];
+      return '<section class="sec scene" id="selector-blok" aria-labelledby="h-sel"><div class="wrap sel">' +
+        '<div><h2 class="h2" id="h-sel">' + esc(b.titel) + '</h2><p class="lead">' + esc(b.tekst) + '</p>' +
+        '<ul class="checks">' + li + '</ul>' + btn(b.cta, 'btn-w') + '</div>' +
+        (extra ? '<img class="sel-img" src="' + img(extra.src) + '" alt="' + esc(extra.alt) + '" loading="lazy">' : '') +
+        '</div></section>';
+    };
+
+    R.partners = function (b) {
+      var li = (b.items || []).map(function (p) {
+        return '<li class="pcard"><span class="plogo"><img src="' + img(p.logo) + '" alt="Logo van ' + esc(p.naam) + '" loading="lazy"></span>' +
+          '<h3 class="h3">' + esc(p.naam) + '</h3><p>' + esc(p.tekst) + '</p>' +
+          '<a class="pcard-a" href="' + esc(p.url) + '">Meer over ' + esc(p.naam) + I.chevRight + '</a></li>';
+      }).join('');
+      return '<section class="sec band-grey" id="partners" aria-labelledby="h-partners"><div class="wrap">' +
+        '<h2 class="h2" id="h-partners">' + esc(b.titel) + '</h2>' +
+        (b.subtitel ? '<p class="lead">' + esc(b.subtitel) + '</p>' : '') +
+        '<ul class="parts">' + li + '</ul></div></section>';
+    };
+
+    R.faq = function (b) {
+      var items = (b.items || []).map(function (q, i) {
+        var id = 'faq-' + i;
+        return '<div class="faq-i"><h3 class="faq-q"><button type="button" class="faq-b" id="' + id + '-b" aria-expanded="false" aria-controls="' + id + '">' +
+          esc(q.vraag) + I.chevDown + '</button></h3>' +
+          '<div class="faq-p" id="' + id + '" role="region" aria-labelledby="' + id + '-b" hidden><p>' + esc(q.antwoord) + '</p></div></div>';
+      }).join('');
+      return '<section class="sec" id="faq" aria-labelledby="h-faq"><div class="wrap">' +
+        '<h2 class="h2" id="h-faq">' + esc(b.titel) + (b.subtitel ? ' <span class="h2-sub">' + esc(b.subtitel) + '</span>' : '') + '</h2>' +
+        '<div class="faq">' + items + '</div></div></section>';
+    };
+
+    function generic(b) {
+      var tekst = b.intro || b.tekst || '';
+      return '<section class="sec" id="' + esc(b.id || '') + '"><div class="wrap">' +
+        (b.titel ? '<h2 class="h2">' + esc(b.titel) + '</h2>' : '') +
+        (tekst ? '<p class="lead">' + esc(tekst) + '</p>' : '') +
+        (b.cta ? btn(b.cta, 'btn-p') : '') +
+        '</div></section>';
+    }
+
+    function stickyHtml() {
+      var sel = blok('selector');
+      var line = sel && sel.items && sel.items[0];
+      return '<div class="stick" id="stick" role="region" aria-label="Snel naar de Partner Selector" hidden>' +
+        '<div class="stick-in">' + (line ? '<p class="stick-t">' + esc(line) + '</p>' : '') + btn(heroCta(), 'btn-p') + '</div>' +
+        '<button type="button" class="stick-x" id="stick-x" aria-label="Sluit deze balk">' + I.close + '</button></div>';
+    }
+
+    /* ---------- gedrag ---------- */
+    function bindSituaties() {
+      var fs = document.getElementById('sits');
+      var nudge = document.getElementById('nudge');
+      var count = document.getElementById('sits-c');
+      var status = document.getElementById('sits-s');
+      if (!fs || !nudge) return;
+      var boxes = Array.prototype.slice.call(fs.querySelectorAll('.sit-in'));
+      var slot = nudge.querySelector('.nudge-t');
+      var slotTxt = slot ? slot.textContent : '';
+      var wasOn = false;
+      function update() {
+        var n = boxes.filter(function (b) { return b.checked; }).length;
+        boxes.forEach(function (b) { b.closest('.sit').classList.toggle('is-checked', b.checked); });
+        var tekst = n === 0 ? '' : 'Je herkent ' + n + ' van de ' + boxes.length + ' situaties.';
+        count.textContent = tekst;
+        var on = n >= 2;
+        if (on && !wasOn) {
+          nudge.hidden = false;
+          requestAnimationFrame(function () { nudge.classList.add('is-on'); });
+        } else if (!on && wasOn) {
+          nudge.classList.remove('is-on');
+          nudge.hidden = true;
+        }
+        wasOn = on;
+        status.textContent = tekst + (on ? ' ' + slotTxt : '');
+      }
+      fs.addEventListener('change', update);
+    }
+
+    function bindDisclosures() {
+      document.addEventListener('click', function (e) {
+        var b = e.target.closest('[aria-expanded][aria-controls]');
+        if (!b) return;
+        var panel = document.getElementById(b.getAttribute('aria-controls'));
+        if (!panel) return;
+        var open = b.getAttribute('aria-expanded') === 'true';
+        b.setAttribute('aria-expanded', open ? 'false' : 'true');
+        panel.hidden = open;
+      });
+    }
+
+    function bindSticky() {
+      var host = document.getElementById('stick-host');
+      host.innerHTML = stickyHtml();
+      var bar = document.getElementById('stick');
+      var hero = document.getElementById('hero');
+      var sel = document.getElementById('selector-blok');
+      var footer = document.querySelector('.bolx-footer') || document.getElementById('faq');
+      if (!bar || !hero || !('IntersectionObserver' in window)) return;
+      var hh = (window.BolShell && BolShell.headerHeight()) || 152;
+      var heroIn = true, selIn = false, footIn = false, dismissed = false, shown = false, timer = null;
+      function apply() {
+        var want = !heroIn && !selIn && !footIn && !dismissed;
+        if (want === shown) return;
+        shown = want;
+        clearTimeout(timer);
+        if (want) {
+          bar.hidden = false;
+          requestAnimationFrame(function () { bar.classList.add('is-on'); });
+          document.documentElement.classList.add('has-stick');
+        } else {
+          bar.classList.remove('is-on');
+          document.documentElement.classList.remove('has-stick');
+          timer = setTimeout(function () { bar.hidden = true; }, 260);
+        }
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.target === hero) heroIn = en.isIntersecting;
+          else if (en.target === sel) selIn = en.isIntersecting;
+          else if (en.target === footer) footIn = en.isIntersecting;
+        });
+        apply();
+      }, { threshold: 0, rootMargin: '-' + Math.round(hh) + 'px 0px 0px 0px' });
+      io.observe(hero);
+      if (sel) io.observe(sel);
+      if (footer) io.observe(footer);
+      document.getElementById('stick-x').addEventListener('click', function () {
+        dismissed = true;
+        apply();
+      });
+    }
+
+    function placeSkip() {
+      var skip = document.getElementById('skip');
+      if (skip && document.body.firstChild !== skip) document.body.insertBefore(skip, document.body.firstChild);
+    }
+
+    /* ---------- render ---------- */
+    function render() {
+      var app = document.getElementById('app');
+      var html = (data.blokken || []).map(function (b) {
+        var fn = R[b.id] || generic;
+        return fn(b);
+      }).join('');
+      app.innerHTML = html;
+      app.removeAttribute('aria-busy');
+      bindSituaties();
+      bindDisclosures();
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindSticky);
+      else bindSticky();
+    }
+
+    function fail(err) {
+      var app = document.getElementById('app');
+      app.innerHTML = '<div class="wrap state"><p>De inhoud kon niet geladen worden. Open deze pagina via de lokale server: http://localhost:8080/bol-skills/varianten/typeui.html</p></div>';
+      app.removeAttribute('aria-busy');
+      if (window.console) console.error(err);
+    }
+
+    placeSkip();
+    fetch('../content.json')
+      .then(function (r) { if (!r.ok) throw new Error('content.json: ' + r.status); return r.json(); })
+      .then(function (json) { data = json; render(); })
+      .catch(fail);
+  })();
+  </script>
+</body>
+</html>

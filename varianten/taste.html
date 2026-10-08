@@ -1,0 +1,608 @@
+<!doctype html>
+<!--
+  Skill: taste-skill. Plek op het spectrum: Interactief. Concept: Selector in de hero.
+  De Partner Selector staat op de echte pagina achter een externe link; hier start hij meteen onder de h1: vier voorbeeldvragen uit content.json, een per keer, als klikbare kaartjes met voortgangsbolletjes, terug-knop en toetsenbordbediening, en na de laatste vraag de vier partners op volgorde van het aantal overeenkomsten met hun profiel (zichtbaar gelabeld als voorbeeld, geen percentages), met de echte knop naar de externe selector voor het volledige advies.
+  Keuzes: design read is een behoudende redesign (dials variance 5, motion 4, density 4), de hero is een split met de selector links onder de titel en het bol-beeld rechts, zodat de eerste vraag boven de vouw staat op 1440 en op 390 px (op gsm schuift de intro onder de kaart); de rest van de pagina blijft rustig in bol-stijl: situaties als grid, stappen naast een warehouse-beeld, voordelen als bento met de 60% als scene, Medisana als voor-en-na met quote, ecosysteem en selector in een blauwe scene, vier partnerkaarten, FAQ als accordeon; lange tekst zit achter details of een klik, beweging enkel op transform en opacity met prefers-reduced-motion.
+  Alternatieven die ik overwoog: de selector als volle blauwe scene met het beeld erachter (minder bol, verbergt het beeld), de selector als vast zijpaneel dat meescrolt (te zwaar naast de sticky header), en de zes situaties als aanvinkbare kaartjes die de vragen voorinvullen (leuk, maar twee interacties boven elkaar maakt de hero druk).
+-->
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bol fulfilmentpartners: taste-skill</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  .bolx-content{overflow-x:clip;color:var(--bol-ink)}
+  .bolx-content img{max-width:100%}
+  .wrap{width:100%;max-width:var(--bol-container);margin:0 auto;padding:0 16px}
+  @media (min-width:1024px){.wrap{padding:0 24px}}
+
+  h1,h2,h3{margin:0;font-family:var(--bol-font-display);font-weight:700;color:var(--bol-blue)}
+  h1{font-weight:900;font-size:28px;line-height:32px;letter-spacing:-.01em}
+  h2{font-size:24px;line-height:28px}
+  h3{font-size:18px;line-height:24px}
+  @media (min-width:768px){
+    h1{font-size:40px;line-height:44px}
+    h2{font-size:32px;line-height:36px}
+    h3{font-size:20px;line-height:26px}
+  }
+  p{margin:0}
+  a{color:var(--bol-blue-action)}
+  a:not([class*="btn"]):hover{color:var(--bol-blue-hover)}
+  :focus-visible{outline:2px solid var(--bol-blue-action);outline-offset:2px}
+  .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .ic{width:24px;height:24px;flex:none;display:inline-block;vertical-align:middle}
+  .state{padding:64px 16px;text-align:center;color:var(--bol-ink-medium)}
+  ul[role=list],ol[role=list]{list-style:none;margin:0;padding:0}
+
+  /* knoppen, links, tags */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border-radius:var(--bol-radius-2);border:1px solid transparent;font:600 14px/20px var(--bol-font-body);text-decoration:none;cursor:pointer;white-space:nowrap;transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .1s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn .ic{width:20px;height:20px}
+  .btn-primary{background:var(--bol-blue-action);border-color:var(--bol-blue-action);color:#fff}
+  .btn-primary:hover{background:var(--bol-blue-hover);border-color:var(--bol-blue-hover);color:#fff;box-shadow:var(--bol-shadow-2)}
+  .btn-secondary{background:#fff;border-color:var(--bol-blue-action);color:var(--bol-blue-action)}
+  .btn-secondary:hover{border-color:var(--bol-blue-hover);color:var(--bol-blue-hover);box-shadow:var(--bol-shadow-2)}
+  .link{display:inline-flex;align-items:center;gap:4px;font-weight:600;text-decoration:underline;text-underline-offset:3px;border-radius:var(--bol-radius-1)}
+  .link .ic{width:20px;height:20px}
+  .link-btn{background:none;border:0;padding:0;min-height:48px;cursor:pointer;font:600 16px/24px var(--bol-font-body);color:var(--bol-blue-action)}
+  .link-btn:hover{color:var(--bol-blue-hover)}
+  .tag{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:var(--bol-radius-4);background:var(--bol-blue-low);color:var(--bol-blue);font:600 12px/16px var(--bol-font-body);white-space:nowrap}
+  .note{margin-top:20px;max-width:720px}
+  .note summary{display:inline-flex;align-items:center;gap:6px;cursor:pointer;list-style:none;color:var(--bol-blue-action);font:600 14px/20px var(--bol-font-body);border-radius:var(--bol-radius-1)}
+  .note summary::-webkit-details-marker{display:none}
+  .note summary .ic{width:20px;height:20px;transition:transform .2s ease}
+  .note[open] summary .ic{transform:rotate(180deg)}
+  .note p{margin-top:12px;font-size:14px;line-height:20px;color:var(--bol-ink-medium)}
+  .sec-head{max-width:720px;margin-bottom:24px;display:grid;gap:8px}
+  .anchor{scroll-margin-top:calc(var(--bol-header-h) + 16px)}
+
+  /* onthulling bij scrollen */
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* hero met selector */
+  .hero{background:var(--bol-blue-minimal);padding:24px 0 40px}
+  .hero-grid{display:grid;gap:16px}
+  .hero-title{order:1}
+  .selector{order:2}
+  .hero-intro{order:3;max-width:62ch}
+  .hero-media{order:4;margin:0;border-radius:var(--bol-radius-6);overflow:hidden;background:var(--bol-blue-low);aspect-ratio:16/9}
+  .hero-media img{display:block;width:100%;height:100%;object-fit:cover}
+  @media (min-width:1024px){
+    .hero{padding:40px 0 56px}
+    .hero-grid{grid-template-columns:minmax(0,7fr) minmax(0,5fr);grid-template-areas:"title media" "intro media" "sel media";grid-template-rows:auto auto 1fr;column-gap:56px;row-gap:16px;align-items:start}
+    .hero-title{grid-area:title}
+    .hero-intro{grid-area:intro}
+    .selector{grid-area:sel;margin-top:8px}
+    .hero-media{grid-area:media;align-self:stretch;position:relative;aspect-ratio:auto;min-height:440px;height:100%}
+    .hero-media img{position:absolute;inset:0}
+  }
+  #hero-selector{scroll-margin-top:calc(var(--bol-header-h) + 16px)}
+  .selector{background:#fff;border-radius:var(--bol-radius-6);box-shadow:var(--bol-shadow-2);padding:20px}
+  @media (min-width:768px){.selector{padding:24px 28px}}
+  .sel-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .sel-head .tag{margin-left:auto}
+  .sel-progress{display:inline-flex;gap:6px}
+  .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--bol-blue-low);background:#fff;transition:background-color .2s ease,border-color .2s ease}
+  .dot.done{background:var(--bol-blue);border-color:var(--bol-blue)}
+  .dot.now{background:var(--bol-blue-action);border-color:var(--bol-blue-action)}
+  .sel-step{font:600 14px/20px var(--bol-font-body);color:var(--bol-ink-medium)}
+  .sel-stage{transition:opacity .18s ease,transform .18s ease}
+  .sel-stage.leave{opacity:0;transform:translateX(-10px)}
+  .sel-stage.enter{opacity:0;transform:translateX(10px);transition:none}
+  .sel-q{font-size:20px;line-height:26px;margin-bottom:16px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+  .sel-q:focus{outline:none}
+  .sel-options{display:grid;gap:8px}
+  @media (min-width:600px){.sel-options{grid-template-columns:1fr 1fr;gap:12px}}
+  .opt{display:flex;align-items:center;gap:12px;min-height:56px;padding:12px 16px;background:#fff;border:2px solid var(--bol-border);border-radius:var(--bol-radius-4);font:600 16px/22px var(--bol-font-body);color:var(--bol-ink);text-align:left;cursor:pointer;transition:border-color .15s ease,background-color .15s ease,transform .1s ease}
+  .opt:hover{border-color:var(--bol-blue-action)}
+  .opt:active{transform:scale(.985)}
+  .opt[aria-pressed=true]{border-color:var(--bol-blue-action);background:var(--bol-blue-minimal)}
+  .opt-ring{width:22px;height:22px;border-radius:50%;border:2px solid var(--bol-border);flex:none;display:grid;place-items:center;color:#fff;transition:background-color .15s ease,border-color .15s ease}
+  .opt:hover .opt-ring{border-color:var(--bol-blue-action)}
+  .opt[aria-pressed=true] .opt-ring{background:var(--bol-blue-action);border-color:var(--bol-blue-action)}
+  .opt-ring .ic{width:14px;height:14px;opacity:0;stroke-width:3}
+  .opt[aria-pressed=true] .opt-ring .ic{opacity:1}
+  .sel-foot{display:flex;align-items:center;justify-content:space-between;gap:12px 16px;flex-wrap:wrap;margin-top:20px;min-height:48px}
+  .sel-hint{font:400 14px/20px var(--bol-font-body);color:var(--bol-ink-medium)}
+  .sel-note{font-size:14px;line-height:20px;color:var(--bol-ink-medium);margin:-4px 0 16px}
+  .sel-rank{display:grid;gap:8px;margin-bottom:20px}
+  .rank-item{display:grid;grid-template-columns:28px 64px minmax(0,1fr);gap:12px;align-items:center;padding:10px 12px;border:2px solid var(--bol-border);border-radius:var(--bol-radius-4)}
+  .rank-item.top{border-color:var(--bol-blue-action);background:var(--bol-blue-minimal)}
+  .rank-n{font:300 28px/28px var(--bol-font-display);color:var(--bol-blue);text-align:center}
+  .rank-logo{height:40px;display:flex;align-items:center}
+  .rank-logo img{max-height:32px;max-width:64px;object-fit:contain}
+  .rank-body{display:grid;gap:2px;min-width:0}
+  .rank-name{font-weight:600}
+  .rank-score{font-size:14px;line-height:20px;color:var(--bol-ink-medium)}
+  .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+  .chip{font:400 12px/16px var(--bol-font-body);padding:2px 8px;border-radius:var(--bol-radius-1);background:var(--bol-blue-low);color:var(--bol-blue)}
+  .sel-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+
+  /* situaties */
+  .sit{background:var(--bol-grey);padding:48px 0}
+  @media (min-width:768px){.sit{padding:64px 0}}
+  .sit-grid{display:grid;gap:12px}
+  @media (min-width:768px){.sit-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
+  .sit-item{display:flex;gap:12px;align-items:center;background:#fff;border-radius:var(--bol-radius-4);padding:16px;box-shadow:var(--bol-shadow-1);font-weight:600}
+  .sit-ico{width:40px;height:40px;border-radius:50%;background:var(--bol-blue-minimal);color:var(--bol-blue);display:grid;place-items:center;flex:none}
+  .sit-slot{margin-top:24px;max-width:720px;display:grid;gap:8px;font-weight:600;color:var(--bol-blue)}
+
+  /* stappen */
+  .steps{padding:48px 0}
+  @media (min-width:768px){.steps{padding:64px 0}}
+  .steps-grid{display:grid;gap:24px}
+  @media (min-width:1024px){.steps-grid{grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:center}}
+  .steps-media{margin:0;border-radius:var(--bol-radius-6);overflow:hidden;aspect-ratio:4/3;background:var(--bol-blue-low)}
+  .steps-media img{display:block;width:100%;height:100%;object-fit:cover}
+  .steps-copy{display:grid;gap:16px}
+  .steps-list{display:grid;gap:12px;margin:8px 0}
+  .step{display:grid;grid-template-columns:40px 40px minmax(0,1fr);gap:12px;align-items:center}
+  .step-n{font:300 40px/40px var(--bol-font-display);color:var(--bol-blue);text-align:center}
+  .step-ico{width:40px;height:40px;border-radius:50%;background:var(--bol-blue-minimal);color:var(--bol-blue);display:grid;place-items:center}
+  .step h3{font-family:var(--bol-font-body);font-weight:600;font-size:16px;line-height:22px;color:var(--bol-ink)}
+  .steps-slot{color:var(--bol-ink-medium)}
+
+  /* voordelen */
+  .adv{background:var(--bol-blue-minimal);padding:48px 0}
+  @media (min-width:768px){.adv{padding:64px 0}}
+  .adv-grid{display:grid;gap:12px;margin-top:24px}
+  @media (min-width:768px){.adv-grid{grid-template-columns:2fr 1fr 1fr;gap:16px}}
+  .adv-card{background:#fff;border-radius:var(--bol-radius-4);padding:24px;box-shadow:var(--bol-shadow-1);display:flex;flex-direction:column;gap:12px}
+  .adv-card .ic-wrap{width:44px;height:44px;border-radius:var(--bol-radius-2);background:var(--bol-blue-minimal);color:var(--bol-blue);display:grid;place-items:center}
+  .adv-card p{font-size:14px;line-height:20px;color:var(--bol-ink-medium)}
+  .adv-card.big{background:var(--bol-blue);border-radius:var(--bol-radius-6);padding:28px;order:-1}
+  .adv-card.big h3,.adv-card.big p{color:#fff}
+  .adv-card.big .ic-wrap{background:rgba(255,255,255,.14);color:#fff}
+  .adv-card.big h3{font-weight:700;font-size:18px;line-height:24px;display:grid;gap:4px}
+  .t-big{display:block;font:300 64px/1 var(--bol-font-display);letter-spacing:-.02em}
+  @media (min-width:768px){
+    .adv-card.big{grid-column:1;grid-row:1/3;padding:32px;justify-content:flex-end;order:0}
+    .t-big{font-size:96px}
+  }
+
+  /* medisana */
+  .story{padding:48px 0}
+  @media (min-width:768px){.story{padding:64px 0}}
+  .story-grid{display:grid;gap:24px}
+  @media (min-width:1024px){.story-grid{grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:64px;align-items:center}}
+  .story-copy{display:grid;gap:20px}
+  .story-media{margin:0;border-radius:var(--bol-radius-6);overflow:hidden;aspect-ratio:4/5;background:var(--bol-blue-low)}
+  .story-media img{display:block;width:100%;height:100%;object-fit:cover}
+  @media (max-width:1023px){.story-media{aspect-ratio:16/9}}
+  .ba{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:stretch}
+  .ba-tile{display:grid;gap:4px;background:var(--bol-blue-minimal);border-radius:var(--bol-radius-4);padding:16px}
+  .ba-tile.after{background:var(--bol-blue);color:#fff}
+  .ba-label{font:600 13px/18px var(--bol-font-body);color:var(--bol-ink-medium)}
+  .after .ba-label{color:var(--bol-blue-low)}
+  .ba-val{font:700 22px/26px var(--bol-font-display);color:var(--bol-blue)}
+  @media (min-width:768px){.ba-val{font-size:28px;line-height:32px}}
+  .after .ba-val{color:#fff}
+  .ba-sub{font-size:14px;line-height:20px}
+  .ba-arrow{display:grid;place-items:center;color:var(--bol-blue)}
+  .quote{margin:0;padding:4px 0 4px 20px;border-left:4px solid var(--bol-blue-low);font:600 18px/26px var(--bol-font-body);color:var(--bol-blue)}
+  @media (min-width:768px){.quote{font-size:20px;line-height:28px}}
+  .quote cite{display:block;margin-top:8px;font:400 14px/20px var(--bol-font-body);font-style:normal;color:var(--bol-ink-medium)}
+  .story .note{margin-top:0}
+
+  /* ecosysteem en selector: blauwe scene */
+  .scene{background:linear-gradient(160deg,var(--bol-blue) 0%,#0000D0 100%);color:#fff;padding:48px 0 56px}
+  @media (min-width:768px){.scene{padding:64px 0 72px}}
+  .scene h2{color:#fff}
+  .eco{max-width:720px;display:grid;gap:12px;margin-bottom:32px}
+  .sel-banner{background:#fff;color:var(--bol-ink);border-radius:var(--bol-radius-6);box-shadow:var(--bol-shadow-2);display:grid;overflow:hidden}
+  @media (min-width:1024px){.sel-banner{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}}
+  .sel-banner-copy{padding:24px;display:grid;gap:16px;align-content:start}
+  @media (min-width:768px){.sel-banner-copy{padding:40px}}
+  .sel-banner h2{color:var(--bol-blue);font-size:24px;line-height:28px}
+  @media (min-width:768px){.sel-banner h2{font-size:28px;line-height:32px}}
+  .checks{display:grid;gap:10px}
+  .checks li{display:flex;gap:10px;align-items:flex-start}
+  .checks .ic{color:var(--bol-blue-action);width:22px;height:22px;margin-top:1px}
+  .sel-banner-copy .btn{justify-self:start}
+  .sel-banner-media{margin:0;position:relative;aspect-ratio:16/9;background:var(--bol-blue-low)}
+  .sel-banner-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  @media (min-width:1024px){.sel-banner-media{aspect-ratio:auto;min-height:100%}}
+
+  /* partners */
+  .partners{padding:48px 0}
+  @media (min-width:768px){.partners{padding:64px 0}}
+  .partners-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-bottom:24px}
+  .partners-head p{color:var(--bol-ink-medium)}
+  .p-grid{display:grid;grid-auto-flow:column;grid-auto-columns:min(300px,82%);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 0 12px;-webkit-overflow-scrolling:touch}
+  @media (min-width:1024px){.p-grid{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;overflow:visible;padding:4px 0}}
+  .p-card{position:relative;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:var(--bol-radius-4);padding:24px;box-shadow:var(--bol-shadow-1);border:2px solid transparent;scroll-snap-align:start;transition:border-color .15s ease}
+  .p-card:hover,.p-card:focus-within{border-color:var(--bol-blue-action)}
+  .p-logo{height:48px;display:flex;align-items:center}
+  .p-logo img{max-height:40px;max-width:140px;object-fit:contain}
+  .p-match{align-self:flex-start}
+  .p-card p{font-size:14px;line-height:20px;color:var(--bol-ink-medium);flex:1}
+  .p-link{align-self:flex-start}
+
+  /* faq */
+  .faq{background:var(--bol-grey);padding:48px 0}
+  @media (min-width:768px){.faq{padding:64px 0}}
+  .faq-inner{max-width:848px}
+  .faq-sub{display:block;font:400 16px/24px var(--bol-font-body);color:var(--bol-ink-medium);margin-top:4px}
+  .faq-list{margin-top:24px;display:grid;gap:8px}
+  .faq-item{background:#fff;border-radius:var(--bol-radius-4);box-shadow:var(--bol-shadow-1)}
+  .faq-item h3{margin:0}
+  .faq-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:56px;padding:16px 20px;background:none;border:0;border-radius:var(--bol-radius-4);text-align:left;font:600 16px/24px var(--bol-font-body);color:var(--bol-blue);cursor:pointer}
+  .faq-btn .ic{color:var(--bol-blue-action);transition:transform .2s ease}
+  .faq-btn[aria-expanded=true] .ic{transform:rotate(180deg)}
+  .faq-panel{padding:0 20px 20px}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{transition:none !important;animation:none !important}
+    .reveal{opacity:1;transform:none}
+    .sel-stage.leave,.sel-stage.enter{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<script src="../bol-shell.js"></script>
+<main class="bolx-content" id="inhoud"><p class="state" aria-busy="true">Inhoud laden</p></main>
+<script>
+(function () {
+  'use strict';
+  const REDUCE = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const main = document.querySelector('.bolx-content');
+
+  /* iconen: inline SVG, 24 px, stroke currentColor met ronde uiteinden (in de stijl van bol) */
+  const PATHS = {
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    chevDown: '<path d="M6 9.5l6 6 6-6"/>',
+    chevRight: '<path d="M9.5 6l6 6-6 6"/>',
+    arrowLeft: '<path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/>',
+    arrowRight: '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
+    external: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+    refresh: '<path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/>',
+    truck: '<rect x="3" y="6" width="11" height="10" rx="1"/><path d="M14 10h4l3 3v3h-7"/><circle cx="7.5" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/>',
+    chart: '<path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h5v5"/>',
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    scale: '<path d="M4 10V4h6"/><path d="M20 14v6h-6"/><path d="M4 4l6 6"/><path d="M20 20l-6-6"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3.5 3 14.5 0 18"/><path d="M12 3c-3 3.5-3 14.5 0 18"/>',
+    box: '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5"/><path d="M12 12L4 7.5"/><path d="M12 12v9"/>',
+    back: '<path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10h-3"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
+  };
+  const icon = (name, cls) => `<svg class="ic${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${PATHS[name] || PATHS.check}</svg>`;
+
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const url = (u, links) => (typeof u === 'string' && u.indexOf('@links.') === 0) ? (links[u.slice(7)] || '#') : (u || '#');
+  const img = (src) => '../' + src;
+  /* zinnen splitsen, enkel voor teksten zonder cijfers met punten */
+  const sentences = (t) => (String(t || '').match(/[^.!?]+(?:[.!?]+|$)/g) || [t]).map((s) => s.trim()).filter(Boolean);
+
+  function ctaAttrs(c, links) {
+    return `href="${esc(url(c.url, links))}"${c.extern ? ' target="_blank" rel="noopener"' : ''}`;
+  }
+  function ctaInner(c) {
+    return esc(c.label) + (c.extern ? icon('external') + '<span class="sr-only">(opent in een nieuw venster)</span>' : icon('chevRight'));
+  }
+  const cta = (c, links, cls) => `<a class="btn ${cls}" ${ctaAttrs(c, links)}>${ctaInner(c)}</a>`;
+  const ctaLink = (c, links) => `<a class="link" ${ctaAttrs(c, links)}>${ctaInner(c)}</a>`;
+
+  /* renderers per blok: eerst op id, dan op Contentstack-type */
+  const R = {};
+
+  R.hero = (b) => `
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <h1 class="hero-title" id="hero-title">${esc(b.titel)}</h1>
+    <p class="hero-intro">${esc(b.intro)}</p>
+    <div class="selector" id="hero-selector" role="group" aria-label="Partner selector, voorbeeld met 4 vragen">
+      <div class="sel-head">
+        <span class="sel-progress" id="sel-progress" aria-hidden="true"></span>
+        <span class="sel-step" id="sel-step"></span>
+        <span class="tag">voorbeeld</span>
+      </div>
+      <div class="sel-stage" id="sel-stage"></div>
+      <p class="sr-only" id="sel-live" aria-live="polite"></p>
+    </div>
+    ${b.beeld ? `<figure class="hero-media"><img src="${esc(img(b.beeld.src))}" alt="${esc(b.beeld.alt)}"${b.beeld.breedte ? ` width="${b.beeld.breedte}" height="${b.beeld.hoogte}"` : ''} loading="eager" decoding="async"></figure>` : ''}
+  </div>
+</section>`;
+
+  R.usp_list = (b) => {
+    const s = sentences(b.intro);
+    const intro = s.length > 1 ? s[s.length - 1] : (b.intro || '');
+    const icons = ['chart', 'clock', 'box', 'scale', 'target', 'globe'];
+    return `
+<section class="sit" aria-labelledby="${esc(b.id)}-title">
+  <div class="wrap reveal">
+    <div class="sec-head"><h2 id="${esc(b.id)}-title">${esc(b.titel)}</h2>${intro ? `<p>${esc(intro)}</p>` : ''}</div>
+    <ul class="sit-grid" role="list">${(b.items || []).map((t, i) => `<li class="sit-item"><span class="sit-ico">${icon(icons[i % icons.length])}</span><span>${esc(t)}</span></li>`).join('')}</ul>
+    ${b.slot ? `<div class="sit-slot"><p>${esc(b.slot)}</p><a class="link" href="#hero-selector">Beantwoord de 4 vragen${icon('arrowRight')}</a></div>` : ''}
+  </div>
+</section>`;
+  };
+
+  R.step_by_step_card = (b, ctx) => {
+    const beelden = ctx.data.extraBeelden || [];
+    const pic = beelden[1] || beelden[0];
+    const icons = ['box', 'truck', 'back'];
+    return `
+<section class="steps" aria-labelledby="${esc(b.id)}-title">
+  <div class="wrap steps-grid reveal">
+    ${pic ? `<figure class="steps-media"><img src="${esc(img(pic.src))}" alt="${esc(pic.alt)}" loading="lazy" decoding="async"></figure>` : ''}
+    <div class="steps-copy">
+      <h2 id="${esc(b.id)}-title">${esc(b.titel)}</h2>
+      ${b.intro ? `<p>${esc(b.intro)}</p>` : ''}
+      <ol class="steps-list" role="list">${(b.stappen || []).map((s, i) => `<li class="step"><span class="step-n" aria-hidden="true">${esc(s.nummer)}</span><span class="step-ico">${icon(icons[i % icons.length])}</span><h3>${esc(s.titel)}</h3></li>`).join('')}</ol>
+      ${b.slot ? `<p class="steps-slot">${esc(b.slot)}</p>` : ''}
+    </div>
+  </div>
+</section>`;
+  };
+
+  R.usp_cards = (b) => `
+<section class="adv" aria-labelledby="${esc(b.id)}-title">
+  <div class="wrap reveal">
+    <h2 id="${esc(b.id)}-title">${esc(b.titel)}</h2>
+    <ul class="adv-grid" role="list">${(b.items || []).map((it) => {
+      const big = it.cijfer != null;
+      let title = esc(it.titel);
+      if (big) {
+        const re = new RegExp(escRe(esc(String(it.cijfer) + (it.eenheid || ''))) + '\\*?');
+        title = title.replace(re, (m) => `<span class="t-big">${m}</span>`);
+      }
+      return `<li class="adv-card${big ? ' big' : ''}"><span class="ic-wrap">${icon(it.icoon)}</span><h3>${title}</h3><p>${esc(it.tekst)}</p></li>`;
+    }).join('')}</ul>
+    ${b.voetnoot ? `<details class="note"><summary>${icon('chevDown')}<span>Toelichting bij het percentage</span></summary><p>${esc(b.voetnoot)}</p></details>` : ''}
+  </div>
+</section>`;
+
+  R.medisana = (b, ctx) => `
+<section class="story" aria-labelledby="${esc(b.id)}-title">
+  <div class="wrap story-grid reveal">
+    <div class="story-copy">
+      <h2 id="${esc(b.id)}-title">${esc(b.titel)}</h2>
+      ${b.voor && b.na ? `<div class="ba" role="group" aria-label="Levertijd vroeger en nu">
+        <div class="ba-tile"><span class="ba-label">${esc(b.voor.label)}</span><span class="ba-val">${esc(b.voor.waarde)}</span>${b.voor.vanuit ? `<span class="ba-sub">vanuit ${esc(b.voor.vanuit)}</span>` : ''}</div>
+        <span class="ba-arrow" aria-hidden="true">${icon('arrowRight')}</span>
+        <div class="ba-tile after"><span class="ba-label">${esc(b.na.label)}</span><span class="ba-val">${esc(b.na.waarde)}</span>${b.na['in'] ? `<span class="ba-sub">in ${esc(b.na['in'])}</span>` : ''}</div>
+      </div>` : ''}
+      ${b.quote ? `<blockquote class="quote"><p>${esc(b.quote)}</p>${b.quoteBron ? `<cite>${esc(b.quoteBron)}</cite>` : ''}</blockquote>` : ''}
+      ${b.tekst ? `<details class="note"><summary>${icon('chevDown')}<span>Meer over Medisana</span></summary><p>${esc(b.tekst)}</p></details>` : ''}
+      ${b.cta ? `<p>${cta(b.cta, ctx.links, 'btn-secondary')}</p>` : ''}
+    </div>
+    ${b.beeld ? `<figure class="story-media"><img src="${esc(img(b.beeld.src))}" alt="${esc(b.beeld.alt)}" loading="lazy" decoding="async"></figure>` : ''}
+  </div>
+</section>`;
+
+  /* ecosysteem opent de blauwe scene, selector sluit ze (anchor_point zit ertussen in content.json) */
+  R.ecosysteem = (b) => {
+    const s = sentences(b.tekst);
+    return `
+<section class="scene" aria-labelledby="${esc(b.id)}-title">
+  <div class="wrap">
+    <div class="eco reveal"><h2 id="${esc(b.id)}-title">${esc(b.titel)}</h2><p>${esc(s.slice(0, 2).join(' '))}</p></div>`;
+  };
+
+  R.anchor_point = (b) => `<div id="${esc(b.id)}" class="anchor"></div>`;
+
+  R.selector = (b, ctx) => {
+    const pic = (ctx.data.extraBeelden || [])[2];
+    return `
+    <div class="sel-banner reveal">
+      <div class="sel-banner-copy">
+        <h2 id="${esc(b.id)}-title">${esc(b.titel)}</h2>
+        ${b.tekst ? `<p>${esc(b.tekst)}</p>` : ''}
+        <ul class="checks" role="list">${(b.items || []).map((t) => `<li>${icon('check')}<span>${esc(t)}</span></li>`).join('')}</ul>
+        ${b.cta ? cta(b.cta, ctx.links, 'btn-primary') : ''}
+      </div>
+      ${pic ? `<figure class="sel-banner-media"><img src="${esc(img(pic.src))}" alt="${esc(pic.alt)}" loading="lazy" decoding="async"></figure>` : ''}
+    </div>
+  </div>
+</section>`;
+  };
+
+  R.text_snippet = (b) => `
+<section aria-labelledby="${esc(b.id)}-title"><div class="wrap reveal"><div class="sec-head"><h2 id="${esc(b.id)}-title">${esc(b.titel)}</h2>${b.tekst ? `<p>${esc(b.tekst)}</p>` : ''}</div></div></section>`;
+
+  R.card_carousel = (b) => `
+<section class="partners" aria-labelledby="${esc(b.id)}-title">
+  <div class="wrap reveal">
+    <div class="partners-head"><h2 id="${esc(b.id)}-title">${esc(b.titel)}</h2>${b.subtitel ? `<p>${esc(b.subtitel)}</p>` : ''}</div>
+    <ul class="p-grid" role="list">${(b.items || []).map((p) => `<li class="p-card" data-partner="${esc(p.naam)}">
+      <div class="p-logo"><img src="${esc(img(p.logo))}" alt="Logo ${esc(p.naam)}" loading="lazy" decoding="async"></div>
+      <span class="tag p-match" hidden></span>
+      <h3>${esc(p.naam)}</h3>
+      <p>${esc(p.tekst)}</p>
+      <a class="link p-link" href="${esc(p.url)}">Bekijk ${esc(p.naam)}${icon('chevRight')}</a>
+    </li>`).join('')}</ul>
+  </div>
+</section>`;
+
+  R.faq = (b) => `
+<section class="faq" aria-labelledby="${esc(b.id)}-title">
+  <div class="wrap faq-inner reveal">
+    <h2 id="${esc(b.id)}-title">${esc(b.titel)}${b.subtitel ? `<span class="faq-sub">${esc(b.subtitel)}</span>` : ''}</h2>
+    <div class="faq-list">${(b.items || []).map((q, i) => `<div class="faq-item"><h3><button class="faq-btn" type="button" id="faq-b-${i}" aria-expanded="false" aria-controls="faq-p-${i}"><span>${esc(q.vraag)}</span>${icon('chevDown')}</button></h3><div class="faq-panel" id="faq-p-${i}" role="region" aria-labelledby="faq-b-${i}" hidden><p>${esc(q.antwoord)}</p></div></div>`).join('')}</div>
+  </div>
+</section>`;
+
+  function render(data) {
+    const byId = {};
+    (data.blokken || []).forEach((b) => { byId[b.id] = b; });
+    const ctx = { data, links: data.links || {}, byId };
+    main.innerHTML = (data.blokken || []).map((b) => {
+      const fn = R[b.id] || R[b.type];
+      return fn ? fn(b, ctx) : '';
+    }).join('');
+    initSelector(ctx);
+    initFaq();
+    initReveal();
+  }
+
+  /* de selector in de hero: 4 voorbeeldvragen, daarna de partners op aantal overeenkomsten */
+  function initSelector(ctx) {
+    const stage = document.getElementById('sel-stage');
+    const sel = ctx.byId.selector;
+    if (!stage || !sel || !Array.isArray(sel.vragenVoorbeeld) || !sel.vragenVoorbeeld.length) return;
+    const Q = sel.vragenVoorbeeld;
+    const KEYS = ['volume', 'assortiment', 'regio', 'sterkte']; /* volgorde van de vragen = volgorde van de profielvelden */
+    const partners = (ctx.byId.partners && ctx.byId.partners.items) || [];
+    const heroCta = ctx.byId.hero && ctx.byId.hero.cta;
+    const progress = document.getElementById('sel-progress');
+    const stepEl = document.getElementById('sel-step');
+    const live = document.getElementById('sel-live');
+    let step = 0;
+    let answers = [];
+    let busy = false;
+
+    function rank() {
+      return partners.map((p, i) => {
+        const prof = p.profiel || {};
+        const hits = KEYS.map((k, qi) => (answers[qi] && Array.isArray(prof[k]) && prof[k].indexOf(answers[qi]) >= 0) ? answers[qi] : null).filter(Boolean);
+        return { p, i, hits };
+      }).sort((a, b) => b.hits.length - a.hits.length || a.i - b.i);
+    }
+
+    function head() {
+      progress.innerHTML = Q.map((q, i) => `<span class="dot${i < step ? ' done' : (i === step ? ' now' : '')}"></span>`).join('');
+      stepEl.textContent = step < Q.length ? `Vraag ${step + 1} van ${Q.length}` : 'Jouw overzicht';
+    }
+
+    function question() {
+      const q = Q[step];
+      return `<h2 class="sel-q" id="sel-q" tabindex="-1">${esc(q.vraag)}</h2>
+        <div class="sel-options" role="group" aria-labelledby="sel-q">${(q.opties || []).map((o, i) => `<button type="button" class="opt" data-opt="${i}" aria-pressed="${answers[step] === o}"><span class="opt-ring">${icon('check')}</span><span>${esc(o)}</span></button>`).join('')}</div>
+        <div class="sel-foot">
+          ${step > 0 ? `<button type="button" class="btn btn-secondary" data-back>${icon('arrowLeft')}Terug</button>` : '<span class="sel-hint">Liever eerst lezen? Scrol gewoon verder.</span>'}
+          ${heroCta ? ctaLink(heroCta, ctx.links) : ''}
+        </div>`;
+    }
+
+    function result() {
+      const ranked = rank();
+      applyMatches(ranked);
+      return `<h2 class="sel-q" id="sel-q" tabindex="-1"><span>Partners op volgorde van overeenkomst</span><span class="tag">voorbeeld</span></h2>
+        <p class="sel-note">Gebaseerd op jouw ${Q.length} antwoorden. Het volledige advies krijg je in de Partner Selector.</p>
+        <ol class="sel-rank" role="list">${ranked.map((r, n) => `<li class="rank-item${n === 0 ? ' top' : ''}">
+          <span class="rank-n" aria-hidden="true">${n + 1}</span>
+          <span class="rank-logo"><img src="${esc(img(r.p.logo))}" alt="" loading="lazy" decoding="async"></span>
+          <span class="rank-body"><a class="rank-name" href="${esc(r.p.url)}">${esc(r.p.naam)}</a><span class="rank-score">${r.hits.length} van ${Q.length} overeenkomsten</span>${r.hits.length ? `<span class="chips">${r.hits.map((h) => `<span class="chip">${esc(h)}</span>`).join('')}</span>` : ''}</span>
+        </li>`).join('')}</ol>
+        <div class="sel-actions">
+          ${heroCta ? cta(heroCta, ctx.links, 'btn-primary') : ''}
+          <button type="button" class="btn btn-secondary" data-back>${icon('arrowLeft')}Terug</button>
+          <button type="button" class="link link-btn" data-restart>${icon('refresh')}Opnieuw</button>
+        </div>`;
+    }
+
+    function applyMatches(ranked) {
+      document.querySelectorAll('.p-card').forEach((card) => {
+        const el = card.querySelector('.p-match');
+        const r = ranked.find((x) => x.p.naam === card.getAttribute('data-partner'));
+        if (!el) return;
+        if (r) { el.textContent = `${r.hits.length} van ${Q.length} overeenkomsten, voorbeeld`; el.hidden = false; }
+        else { el.hidden = true; }
+      });
+    }
+    function clearMatches() {
+      document.querySelectorAll('.p-match').forEach((el) => { el.hidden = true; el.textContent = ''; });
+    }
+
+    function show(renderFn, moveFocus) {
+      const paint = () => {
+        stage.innerHTML = renderFn();
+        head();
+        if (moveFocus) {
+          const h = document.getElementById('sel-q');
+          if (h) h.focus({ preventScroll: true });
+        }
+        live.textContent = step < Q.length ? `Vraag ${step + 1} van ${Q.length}: ${Q[step].vraag}` : 'Overzicht van de partners op volgorde van overeenkomst, voorbeeld.';
+      };
+      if (REDUCE || !moveFocus) { paint(); return; }
+      stage.classList.add('leave');
+      setTimeout(() => {
+        stage.classList.remove('leave');
+        stage.classList.add('enter');
+        paint();
+        requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('enter')));
+      }, 160);
+    }
+
+    stage.addEventListener('click', (e) => {
+      const opt = e.target.closest('.opt');
+      if (opt) {
+        if (busy) return;
+        busy = true;
+        answers[step] = Q[step].opties[Number(opt.getAttribute('data-opt'))];
+        stage.querySelectorAll('.opt').forEach((b) => b.setAttribute('aria-pressed', String(b === opt)));
+        setTimeout(() => {
+          step += 1;
+          busy = false;
+          show(step < Q.length ? question : result, true);
+        }, REDUCE ? 0 : 180);
+        return;
+      }
+      if (e.target.closest('[data-back]')) {
+        if (step > 0) { step -= 1; show(question, true); }
+        return;
+      }
+      if (e.target.closest('[data-restart]')) {
+        step = 0;
+        answers = [];
+        clearMatches();
+        show(question, true);
+      }
+    });
+
+    /* pijltjes, Home en End tussen de opties; Tab, Enter en spatie werken al via de native knoppen */
+    stage.addEventListener('keydown', (e) => {
+      const opts = Array.prototype.slice.call(stage.querySelectorAll('.opt'));
+      if (!opts.length) return;
+      const i = opts.indexOf(document.activeElement);
+      if (i < 0) return;
+      let j = null;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') j = (i + 1) % opts.length;
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') j = (i - 1 + opts.length) % opts.length;
+      else if (e.key === 'Home') j = 0;
+      else if (e.key === 'End') j = opts.length - 1;
+      if (j !== null) { e.preventDefault(); opts[j].focus(); }
+    });
+
+    show(question, false);
+  }
+
+  function initFaq() {
+    document.querySelectorAll('.faq-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!open));
+        const panel = document.getElementById(btn.getAttribute('aria-controls'));
+        if (panel) panel.hidden = open;
+      });
+    });
+  }
+
+  function initReveal() {
+    const els = document.querySelectorAll('.reveal');
+    if (REDUCE || !('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('in'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    els.forEach((el) => io.observe(el));
+  }
+
+  fetch('../content.json')
+    .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(render)
+    .catch((err) => {
+      main.innerHTML = '<p class="state">De inhoud kon niet geladen worden. Vernieuw de pagina of probeer het later opnieuw.</p>';
+      if (window.console) console.error(err);
+    });
+})();
+</script>
+</body>
+</html>

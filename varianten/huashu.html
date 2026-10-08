@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bol fulfilmentpartners: huashu-design</title>
+<!--
+  Skill: huashu-design. Spectrum: "Leuk en vernieuwend".
+  Concept: "Drie richtingen in één bestand". huashu-design legt altijd eerst drie richtingen voor; omdat niemand kon kiezen zijn alle drie volledig gebouwd en schakel je bovenaan de content tussen A (Van signaal naar partner: een verticale tijdlijn waarvan de bol-blauwe lijn meeloopt met je scroll), B (Gesprek: de pagina als rustig vraag-en-antwoord in bol-blauwe en lichtblauwe bubbels, de selector als keuzebubbels) en C (Jouw leverbelofte: een dashboard met de voordelen als panelen en Medisana als voor/na-paneel); de keuze staat in de URL-hash (#a, #b, #c), standaard A.
+  Keuzes: één fetch van content.json en per richting één renderer die de blokken in CMS-volgorde afloopt, met gedeelde bouwstenen (knoppen, checklist, voor/na, citaat, voetnoot, accordeon, partnerkaarten) zodat de drie richtingen dezelfde inhoud en dezelfde bol-taal spreken. Lange copy staat achter een klik of komt bij scrollen in beeld; de voorbeeldvragen en partnerprofielen zijn overal zichtbaar als "voorbeeld" gelabeld en voegen geen claims toe. Alle beweging is transform en opacity en valt weg bij prefers-reduced-motion.
+  Overwogen alternatieven: een horizontale gepinde scroll-tijdlijn (zwak op gsm), een echte chat met invoerveld (voelt als chatbot, bewust niet) en een dashboard met extra KPI's (zou nieuwe claims zijn, dus niet).
+
+  Expert-review (huashu, 5 dimensies, in tekst, zonder browser):
+  Filosofie 8/10: de vorm komt uit de inhoud (signalen, gesprek, leverbelofte), niet uit een stijlbibliotheek; bol blijft overal herkenbaar.
+  Hiërarchie 8/10: elke richting heeft één h1 boven de vouw en korte blokken; B wordt op gsm lang door de bubbelritmiek.
+  Detail 7/10: node-crossfade, sticky stapnummers en sent-bubbels zijn verzorgd; de iconen zijn eenvoudige lijntekeningen, geen bol-origineel.
+  Functionaliteit 8/10: tabs met pijltjestoetsen, aria-expanded overal, reduced motion maakt alles statisch; de tijdlijn leunt op scroll-rAF.
+  Innovatie 8/10: drie richtingen in één bestand met één contentbron is precies de pitch (CMS levert, AI ontwerpt).
+  Keep: schakelaar plus eigen hero per richting; selector als keuzebubbels met zichtbaar "voorbeeld".
+  Fix: C-panelen worden op 390 px één kolom, het dashboardgevoel leeft daar vooral in de panelkoppen; B kan een inhoudsmenu gebruiken om snel naar de partners te springen.
+  Quick wins: partnerlogo's op gelijke optische hoogte afstemmen, stapfoto's in A croppen op het onderwerp, de 60%-voetnoot in C ook openklapbaar vanuit de kop.
+-->
+<style>
+  .bolx-content{--c:var(--bol-container);--hh:var(--bol-header-h);--sw:56px}
+  .bolx-content *,.bolx-content *::before,.bolx-content *::after{box-sizing:border-box}
+  .bolx-content h1,.bolx-content h2,.bolx-content h3,.bolx-content p,.bolx-content ul,.bolx-content ol,.bolx-content blockquote{margin:0}
+  .bolx-content ul,.bolx-content ol{padding:0;list-style:none}
+  .bolx-content img{display:block;max-width:100%;height:auto}
+  .bolx-content a:not([class*="btn"]){color:var(--bol-blue-action)}
+  .bolx-content [hidden]{display:none!important}
+  .bolx-content :focus-visible{outline:2px solid var(--bol-blue-action);outline-offset:2px}
+  .scene :focus-visible{outline-color:#fff}
+  .wrap{max-width:var(--c);margin:0 auto;padding:0 16px}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .ic{width:24px;height:24px;flex:0 0 24px;display:block}
+  sup{font-size:.5em;line-height:1;vertical-align:top}
+
+  /* typografie */
+  .h1{font:900 32px/36px var(--bol-font-display);color:var(--bol-blue);text-wrap:pretty}
+  .h2{font:700 24px/28px var(--bol-font-display);color:var(--bol-blue);text-wrap:pretty}
+  .h3{font:700 18px/24px var(--bol-font-display);color:var(--bol-ink)}
+  .lead{font-size:16px;line-height:24px}
+  .sm{font-size:14px;line-height:20px}
+  .xs{font-size:12px;line-height:16px}
+  .mut{color:var(--bol-ink-medium)}
+  .mx{max-width:720px}
+  .big{font:300 64px/64px var(--bol-font-display);color:var(--bol-blue);letter-spacing:-.02em}
+  .big-s{font-size:44px;line-height:44px}
+  @media (min-width:768px){
+    .h1{font-size:44px;line-height:48px}
+    .h2{font-size:30px;line-height:36px}
+    .lead{font-size:18px;line-height:28px}
+  }
+
+  /* knoppen, chips, tags */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border-radius:var(--bol-radius-2);border:1px solid transparent;font:600 14px/20px var(--bol-font-body);text-decoration:none;cursor:pointer;background:none;color:inherit;white-space:nowrap}
+  .btn-p{background:var(--bol-blue-action);color:#fff}
+  .btn-p:hover{background:var(--bol-blue-hover);box-shadow:var(--bol-shadow-2)}
+  .btn-s{background:#fff;border-color:var(--bol-blue-action);color:var(--bol-blue-action)}
+  .btn-s:hover{background:var(--bol-blue-minimal);box-shadow:var(--bol-shadow-2)}
+  .btn-w{background:#fff;color:var(--bol-blue)}
+  .btn-w:hover{background:var(--bol-blue-minimal);box-shadow:var(--bol-shadow-2)}
+  .btn-t{padding:0 4px;gap:4px;color:var(--bol-blue-action);white-space:normal;text-align:left}
+  .btn-t:hover{text-decoration:underline}
+  .btn .ic{transition:transform .2s}
+  .btn-t[aria-expanded="true"] .ic{transform:rotate(180deg)}
+  .row-b{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .th{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .cnt{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:var(--bol-radius-1);background:var(--bol-blue-low);color:var(--bol-blue);font:600 12px/16px var(--bol-font-body);white-space:nowrap}
+  .tag{display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:var(--bol-radius-1);background:var(--bol-blue-low);color:var(--bol-blue);font:600 12px/16px var(--bol-font-body);vertical-align:middle}
+  .badge{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:var(--bol-radius-1);background:var(--bol-blue);color:#fff;font:600 12px/16px var(--bol-font-body)}
+  .chip{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:10px 16px;border-radius:var(--bol-radius-2);border:1px solid var(--bol-border);background:#fff;font:400 16px/24px var(--bol-font-body);color:var(--bol-ink);text-align:left;cursor:pointer}
+  .chip:hover{border-color:var(--bol-blue-action)}
+  .chip .box{width:24px;height:24px;flex:0 0 24px;border-radius:var(--bol-radius-1);border:2px solid var(--bol-blue-action);display:grid;place-items:center;color:#fff}
+  .chip .box .ic{width:16px;height:16px;flex-basis:16px;opacity:0;transform:scale(.6);transition:transform .15s,opacity .15s}
+  .chip[aria-pressed="true"]{background:var(--bol-blue-minimal);border-color:var(--bol-blue-action)}
+  .chip[aria-pressed="true"] .box{background:var(--bol-blue-action)}
+  .chip[aria-pressed="true"] .box .ic{opacity:1;transform:scale(1)}
+  .num{width:40px;height:40px;flex:0 0 40px;border-radius:50%;background:var(--bol-blue);color:#fff;font:700 18px/1 var(--bol-font-display);display:grid;place-items:center}
+
+  /* kaarten en scenes */
+  .card{background:#fff;border-radius:var(--bol-radius-4);box-shadow:var(--bol-shadow-1);border:2px solid transparent;padding:24px}
+  .card.hv:hover{border-color:var(--bol-blue-action)}
+  .scene{background:var(--bol-blue);color:#fff;border-radius:var(--bol-radius-6)}
+  .scene .h2,.scene .h3{color:#fff}
+  .scene .mut,.scene .eb{color:var(--bol-blue-low)}
+  .scene .tag{background:#fff;color:var(--bol-blue)}
+  .blk{display:grid;gap:16px;align-content:start}
+  .slot{padding:16px 20px;border-radius:var(--bol-radius-4);background:var(--bol-blue);color:#fff;font-weight:600;max-width:720px}
+  .chk{display:grid;gap:12px}
+  .chk li{display:flex;gap:12px;align-items:flex-start}
+  .chk .dot{width:24px;height:24px;flex:0 0 24px;border-radius:50%;background:var(--bol-blue-low);color:var(--bol-blue);display:grid;place-items:center;margin-top:0}
+  .chk .dot .ic{width:16px;height:16px;flex-basis:16px}
+  .scene .chk .dot{background:#fff}
+  .lines{display:grid;gap:8px}
+  .lines li{display:flex;gap:8px;align-items:flex-start}
+  .lines .ic{color:var(--bol-blue-action)}
+  .q{display:grid;gap:4px}
+  .q p{font:700 20px/28px var(--bol-font-display);color:var(--bol-blue);quotes:"\201C" "\201D";text-wrap:pretty}
+  .q p::before{content:open-quote}
+  .q p::after{content:close-quote}
+  .ba{display:grid;grid-template-columns:1fr;gap:8px;align-items:center}
+  .ba-t{padding:16px;border-radius:var(--bol-radius-4);background:var(--bol-grey);display:grid;gap:2px}
+  .ba-t.na{background:var(--bol-blue-minimal)}
+  .ba-v{font:700 22px/26px var(--bol-font-display);color:var(--bol-ink)}
+  .na .ba-v{font-weight:900;color:var(--bol-blue)}
+  .ba .arr{color:var(--bol-blue);justify-self:center;transform:rotate(90deg)}
+  @media (min-width:480px){.ba{grid-template-columns:1fr auto 1fr;gap:12px}.ba .arr{transform:none}}
+  .fn{display:grid;gap:8px}
+  .fn-t{max-width:720px}
+  .acc{border-top:1px solid var(--bol-border)}
+  .acc-i{border-bottom:1px solid var(--bol-border)}
+  .acc-h{margin:0}
+  .acc-b{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;padding:16px 0;background:none;border:0;text-align:left;font:600 16px/24px var(--bol-font-body);color:var(--bol-ink);cursor:pointer}
+  .acc-b:hover{color:var(--bol-blue-action)}
+  .acc-b .ic{color:var(--bol-blue-action);transition:transform .2s}
+  .acc-b[aria-expanded="true"] .ic{transform:rotate(180deg)}
+  .acc-p{padding:0 0 20px;max-width:720px}
+  .pgrid{display:grid;gap:16px}
+  @media (min-width:600px){.pgrid{grid-template-columns:1fr 1fr}}
+  @media (min-width:1024px){.pgrid{grid-template-columns:repeat(4,1fr)}.pgrid-2{grid-template-columns:1fr 1fr}}
+  .pc{display:flex;flex-direction:column;gap:12px}
+  .logo{height:64px;display:flex;align-items:center}
+  .logo img{max-height:56px;max-width:150px;width:auto;height:auto}
+  .pc-a{margin-top:auto;align-self:flex-start}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .anchor{scroll-margin-top:calc(var(--hh) + var(--sw) + 16px)}
+  .err{padding:48px 0;color:var(--bol-red)}
+
+  /* beweging: enkel transform en opacity */
+  .rv{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+  .rv.in{opacity:1;transform:none}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .pop{animation:pop .3s ease}
+
+  /* schakelaar */
+  .sw{position:sticky;top:var(--hh);z-index:20;background:#fff;border-bottom:1px solid var(--bol-border)}
+  .sw-in{display:flex;align-items:center;gap:16px;min-height:var(--sw);padding-top:8px;padding-bottom:8px}
+  .sw-l{font:600 14px/20px var(--bol-font-body);color:var(--bol-ink-medium);white-space:nowrap}
+  .tabs{display:flex;gap:4px;padding:4px;background:var(--bol-blue-minimal);border-radius:var(--bol-radius-2);flex:1;max-width:760px}
+  .tab{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 12px;border:0;border-radius:var(--bol-radius-1);background:none;color:var(--bol-blue);font:400 14px/20px var(--bol-font-body);cursor:pointer;white-space:nowrap}
+  .tab b{font:900 13px/1 var(--bol-font-display);width:24px;height:24px;flex:0 0 24px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--bol-blue)}
+  .tab:hover{background:var(--bol-blue-low)}
+  .tab[aria-selected="true"]{background:var(--bol-blue);color:#fff;font-weight:600}
+  .tab .n-s{display:none}
+  @media (max-width:767px){.sw-l{display:none}.tab .n-l{display:none}.tab .n-s{display:inline}.tab{padding:0 6px;gap:6px}}
+
+  /* richting A: tijdlijn */
+  .A{padding:32px 0 64px}
+  .tl{position:relative}
+  .tl-rail{position:absolute;left:22px;top:20px;bottom:20px;width:4px;background:var(--bol-blue-low);border-radius:var(--bol-radius-1)}
+  .tl-fill{position:absolute;inset:0;background:var(--bol-blue);border-radius:var(--bol-radius-1);transform-origin:top;transform:scaleY(0)}
+  .tl-step{display:grid;grid-template-columns:48px 1fr;gap:0 12px;padding-bottom:48px}
+  .tl-step.tl-last{padding-bottom:0}
+  .tl-col{position:relative}
+  .tl-body{min-width:0}
+  .tl-node{position:sticky;top:calc(var(--hh) + var(--sw) + 24px);width:40px;height:40px;margin-left:4px;border-radius:50%;background:#fff;border:3px solid var(--bol-blue-low);display:grid;place-items:center;color:var(--bol-blue)}
+  .tl-node::before{content:"";position:absolute;inset:-3px;border-radius:50%;background:var(--bol-blue);transform:scale(0);transition:transform .35s}
+  .tl-node.on::before{transform:scale(1)}
+  .tl-node>*{position:relative;grid-area:1/1;font:700 16px/1 var(--bol-font-display);transition:opacity .35s}
+  .tl-node .nb{color:var(--bol-blue);opacity:1}
+  .tl-node .nw{color:#fff;opacity:0}
+  .tl-node.on .nb{opacity:0}
+  .tl-node.on .nw{opacity:1}
+  .tl-node .ic{color:#fff;opacity:0}
+  .tl-node.on .ic{opacity:1}
+  .tl-node.start i{width:12px;height:12px;border-radius:50%;background:#fff;display:block}
+  @media (min-width:768px){
+    .tl-rail{left:34px}
+    .tl-step{grid-template-columns:72px 1fr;gap:0 24px;padding-bottom:80px}
+    .tl-node{margin-left:16px}
+  }
+  .hero-img{width:100%;border-radius:var(--bol-radius-6);aspect-ratio:1200/430;object-fit:cover}
+  .grid2{display:grid;gap:12px}
+  @media (min-width:768px){.grid2{grid-template-columns:1fr 1fr}}
+  .steps3{display:grid;gap:16px}
+  @media (min-width:768px){.steps3{grid-template-columns:repeat(3,1fr)}}
+  .stp{position:relative;border-radius:var(--bol-radius-4);overflow:hidden;background:#fff;box-shadow:var(--bol-shadow-1);display:grid}
+  .stp-img{width:100%;aspect-ratio:3/2;object-fit:cover}
+  .stp .num{position:absolute;top:12px;left:12px}
+  .stp .h3{padding:16px}
+  .ben{display:grid;gap:16px}
+  @media (min-width:768px){.ben{grid-template-columns:repeat(6,1fr)}.ben>li{grid-column:span 3}.ben>li:nth-child(n+4){grid-column:span 3}}
+  @media (min-width:1024px){.ben>li{grid-column:span 2}.ben>li:nth-child(n+4){grid-column:span 3}}
+  .ben-c{display:grid;gap:8px;align-content:start}
+  .ben-i{color:var(--bol-blue);display:block}
+  .med{display:grid;gap:24px}
+  @media (min-width:1024px){.med{grid-template-columns:1.1fr .9fr;align-items:center}}
+  .med-img{width:100%;border-radius:var(--bol-radius-4);aspect-ratio:3/2;object-fit:cover}
+  .sel{display:grid;gap:24px;padding:32px}
+  @media (min-width:1024px){.sel{grid-template-columns:1.1fr .9fr;padding:48px;align-items:center}}
+  .sel-img{width:100%;border-radius:var(--bol-radius-4);aspect-ratio:3/2;object-fit:cover}
+  .end-l{padding-top:10px}
+
+  /* richting B: gesprek */
+  .B{padding:24px 0 64px}
+  .chat{max-width:880px;margin:0 auto;display:grid;gap:20px}
+  .grp,.try{display:grid;gap:20px}
+  .msg{display:flex;gap:12px;align-items:flex-end}
+  .msg.me{flex-direction:row-reverse}
+  .av{width:32px;height:32px;flex:0 0 32px;border-radius:50%;display:grid;place-items:center;font:900 11px/1 var(--bol-font-display);background:var(--bol-blue);color:#fff}
+  .me .av{background:var(--bol-blue-low);color:var(--bol-blue);font:600 12px/1 var(--bol-font-body)}
+  .bub{max-width:92%;padding:20px;border-radius:24px 24px 24px 4px;background:var(--bol-blue-minimal);display:grid;gap:12px;min-width:0}
+  .bub-hero{max-width:100%}
+  .bub .h2{font-size:24px;line-height:30px}
+  .me .bub{border-radius:24px 24px 4px 24px;background:var(--bol-blue);color:#fff;padding:12px 20px;font-weight:600}
+  .me .bub .h2-q{font:600 16px/24px var(--bol-font-body);color:#fff}
+  .bub.scene{background:var(--bol-blue);color:#fff;border-radius:24px 24px 24px 4px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:92%}
+  .opt{min-height:48px;padding:12px 20px;border-radius:24px 24px 4px 24px;border:1px solid var(--bol-blue-action);background:#fff;color:var(--bol-blue-action);font:600 14px/20px var(--bol-font-body);cursor:pointer;text-align:left}
+  .opt:hover{background:var(--bol-blue-minimal);box-shadow:var(--bol-shadow-2)}
+  .opt[aria-pressed="true"]{background:var(--bol-blue);border-color:var(--bol-blue);color:#fff}
+  .bub-h{margin:0;max-width:92%;display:flex;justify-content:flex-end}
+  .bub-q{cursor:pointer;border:1px solid var(--bol-blue-action);display:flex;align-items:center;gap:12px;text-align:left;font:600 16px/24px var(--bol-font-body);max-width:100%}
+  .me .bub-q[aria-expanded="false"]{background:#fff;color:var(--bol-blue-action)}
+  .me .bub-q[aria-expanded="true"]{background:var(--bol-blue);border-color:var(--bol-blue);color:#fff}
+  .bub-q .ic{transition:transform .2s}
+  .bub-q[aria-expanded="true"] .ic{transform:rotate(180deg)}
+  .bub-img{width:100%;border-radius:var(--bol-radius-4);aspect-ratio:1200/430;object-fit:cover}
+  .bub-img-m{aspect-ratio:2/1}
+  .ol{display:grid;gap:8px}
+  .ol li{display:flex;gap:12px;align-items:center;background:#fff;border-radius:var(--bol-radius-4);padding:12px 16px}
+  .rows{display:grid;gap:8px}
+  .row{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:var(--bol-radius-4);padding:16px}
+  .row>div{display:grid;gap:4px;min-width:0}
+  .row-i{color:var(--bol-blue);display:block;margin-top:2px}
+  .bub .pgrid{gap:12px}
+  .bub .card{padding:16px}
+  @media (min-width:768px){
+    .bub{max-width:80%;padding:24px}
+    .opts,.bub-h{max-width:80%}
+  }
+
+  /* richting C: dashboard */
+  .C{padding:24px 0 64px}
+  .db{display:grid;gap:16px;grid-template-columns:repeat(12,1fr)}
+  .pn{grid-column:1/-1;background:#fff;border-radius:var(--bol-radius-4);box-shadow:var(--bol-shadow-1);padding:24px;display:grid;gap:12px;align-content:start;min-width:0;border:2px solid transparent;transition:opacity .3s}
+  .pn.hv:hover{border-color:var(--bol-blue-action)}
+  .hd{grid-column:1/-1;display:grid;gap:4px;padding-top:16px}
+  .C .anchor{grid-column:1/-1;height:0;margin-bottom:-16px}
+  .eb{font:600 12px/16px var(--bol-font-body);color:var(--bol-ink-medium)}
+  .pn-i{color:var(--bol-blue)}
+  .pn.hero{padding:0;overflow:hidden;gap:0}
+  .hero-t{padding:24px;display:grid;gap:16px;align-content:center}
+  .hero-c{width:100%;height:100%;min-height:200px;object-fit:cover}
+  .cb{display:grid;gap:8px}
+  .cb label{display:flex;gap:12px;align-items:center;min-height:48px;padding:8px 12px;border-radius:var(--bol-radius-2);border:1px solid var(--bol-border);cursor:pointer}
+  .cb label:hover{border-color:var(--bol-blue-action)}
+  .cb label.chd{background:var(--bol-blue-minimal);border-color:var(--bol-blue-action)}
+  .cb input{width:24px;height:24px;margin:0;flex:0 0 24px;accent-color:var(--bol-blue-action)}
+  .st{display:grid;gap:12px;position:relative}
+  .st::before{content:"";position:absolute;left:19px;top:20px;bottom:20px;width:2px;background:var(--bol-blue-low)}
+  .st li{display:flex;gap:12px;align-items:center}
+  .st .num{position:relative}
+  .med2{display:grid;gap:16px}
+  .med2-img{width:100%;border-radius:var(--bol-radius-2);aspect-ratio:3/2;object-fit:cover}
+  .sel2{display:grid;gap:24px}
+  .sels{display:grid;gap:12px;align-content:start;background:rgba(255,255,255,.1);border-radius:var(--bol-radius-4);padding:20px}
+  .sels label{display:grid;gap:6px;font:600 14px/20px var(--bol-font-body)}
+  .sels select{height:48px;border-radius:var(--bol-radius-2);border:1px solid var(--bol-border);background:#fff;color:var(--bol-ink);font:400 16px/24px var(--bol-font-body);padding:0 12px;width:100%}
+  .pn.scene{background:var(--bol-blue);color:#fff;box-shadow:none}
+  .pn .badge{justify-self:start}
+  .pp.match{border-color:var(--bol-blue-action)}
+  .pp.dim{opacity:.45}
+  @media (min-width:768px){
+    .pn.s3,.pn.s4,.pn.s5,.pn.s6,.pn.s7,.pn.s8{grid-column:span 6}
+    .hero-t{padding:40px}
+  }
+  @media (min-width:1024px){
+    .pn.s3{grid-column:span 3}.pn.s4{grid-column:span 4}.pn.s5{grid-column:span 5}
+    .pn.s6{grid-column:span 6}.pn.s7{grid-column:span 7}.pn.s8{grid-column:span 8}
+    .pn.hero{grid-template-columns:1.05fr .95fr}
+    .med2{grid-template-columns:1fr 240px;align-items:center}
+    .med2-img{aspect-ratio:4/5}
+    .sel2{grid-template-columns:1.1fr .9fr}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .bolx-content *,.bolx-content *::before{transition:none!important;animation:none!important}
+    .rv{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+<script src="../bol-shell.js"></script>
+<main class="bolx-content" id="inhoud">
+  <div class="sw">
+    <div class="wrap sw-in">
+      <span class="sw-l" id="sw-l">Drie richtingen, dezelfde inhoud</span>
+      <div class="tabs" role="tablist" aria-labelledby="sw-l">
+        <button type="button" class="tab" role="tab" id="tab-a" data-dir="a" aria-selected="true" aria-controls="stage" tabindex="0"><b aria-hidden="true">A</b><span class="vh">Richting A: </span><span class="n-l">Van signaal naar partner</span><span class="n-s">Tijdlijn</span></button>
+        <button type="button" class="tab" role="tab" id="tab-b" data-dir="b" aria-selected="false" aria-controls="stage" tabindex="-1"><b aria-hidden="true">B</b><span class="vh">Richting B: </span><span class="n-l">Gesprek</span><span class="n-s">Gesprek</span></button>
+        <button type="button" class="tab" role="tab" id="tab-c" data-dir="c" aria-selected="false" aria-controls="stage" tabindex="-1"><b aria-hidden="true">C</b><span class="vh">Richting C: </span><span class="n-l">Jouw leverbelofte</span><span class="n-s">Dashboard</span></button>
+      </div>
+    </div>
+  </div>
+  <div id="stage" role="tabpanel" aria-labelledby="tab-a"></div>
+</main>
+<script>
+(function () {
+  'use strict';
+
+  var BASE = '../';
+  var DIRS = ['a', 'b', 'c'];
+  var KEYS = ['volume', 'assortiment', 'regio', 'sterkte']; /* aanname: volgorde van vragenVoorbeeld = sleutels van profiel */
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stage = document.getElementById('stage');
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var DATA = null;
+  var cur = null;
+  var cleanup = [];
+  var io = null;
+
+  /* iconen: inline SVG, 24 px, rondingen, currentColor. Chevrons zijn de bol-paden uit de schil. */
+  var S = '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+  var I = {
+    chevDown: '<svg class="ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M5.293 8.793a1 1 0 0 1 1.414 0L12 14.086l5.293-5.293a1 1 0 1 1 1.414 1.414l-6 6a1 1 0 0 1-1.414 0l-6-6a1 1 0 0 1 0-1.414" clip-rule="evenodd"/></svg>',
+    chevRight: '<svg class="ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M9.793 16.707a1 1 0 0 1 0-1.414L13.086 12 9.793 8.707a1 1 0 0 1 1.414-1.414l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0" clip-rule="evenodd"/></svg>',
+    arrow: S + '<path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    ext: S + '<path d="M7 17 17 7M9 7h8v8"/></svg>',
+    check: S + '<path d="m5 12.5 4.2 4.2L19 7.5"/></svg>',
+    reset: S + '<path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4.5h4.5"/></svg>',
+    truck: S + '<rect x="2.5" y="6.5" width="11" height="9" rx="1.5"/><path d="M13.5 9.5h3.6l3.4 3.4v2.6h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+    chart: S + '<path d="M4 19h16M7 15v-4M12 15V7M17 15v-6"/></svg>',
+    target: S + '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>',
+    scale: S + '<path d="M4 9V4h5M20 15v5h-5M20 4l-6 6M4 20l6-6"/></svg>',
+    globe: S + '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c3 3 3 14 0 17M12 3.5c-3 3-3 14 0 17"/></svg>'
+  };
+
+  /* korte vormlabels die de variant zelf toevoegt (geen copy, geen claims) */
+  var PROMPT = { voordelen: 'En wat levert dat op?', medisana: 'Heb je een voorbeeld?', ecosysteem: 'Welke partner past bij mij?', partners: 'Met wie werkt bol samen?' };
+  var PNAME = { truck: 'Levertijd', chart: 'Koopblok', target: 'Focus', scale: 'Schaal', globe: 'Internationaal' };
+
+  /* ---------- helpers ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function url(u) { return typeof u === 'string' && u.indexOf('@links.') === 0 ? (DATA.links[u.slice(7)] || '#') : u; }
+  function sentences(t) { return (String(t || '').match(/[^.!?]+[.!?]+/g) || [String(t || '')]).map(function (s) { return s.trim(); }); }
+  function blk(id) { for (var i = 0; i < DATA.blokken.length; i++) { if (DATA.blokken[i].id === id) return DATA.blokken[i]; } return null; }
+  function extra(name) { var e = (DATA.extraBeelden || []).filter(function (x) { return x.src.indexOf(name) >= 0; })[0]; return e || { src: '', alt: '' }; }
+  function img(b, cls, attrs) { if (!b || !b.src) return ''; return '<img class="' + cls + '" src="' + BASE + esc(b.src) + '" alt="' + esc(b.alt) + '"' + (attrs || ' loading="lazy"') + '>'; }
+  function cta(c, cls) {
+    var ext = !!c.extern;
+    return '<a class="btn ' + cls + '" href="' + esc(url(c.url)) + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + '>' + esc(c.label) +
+      (ext ? '<span class="vh"> (opent in een nieuw venster)</span>' + I.ext : I.arrow) + '</a>';
+  }
+  function checks(items) {
+    return '<ul class="chk">' + items.map(function (t) { return '<li><span class="dot">' + I.check + '</span><span>' + esc(t) + '</span></li>'; }).join('') + '</ul>';
+  }
+  function linesOf(text) {
+    return '<ul class="lines">' + sentences(text).map(function (s) { return '<li>' + I.chevRight + '<span>' + esc(s) + '</span></li>'; }).join('') + '</ul>';
+  }
+  function footnote(b, p) {
+    var big = b.items.filter(function (i) { return i.cijfer; })[0];
+    var id = p + '-voetnoot';
+    return '<div class="fn"><p><button type="button" class="btn btn-t" aria-expanded="false" aria-controls="' + id + '">Toelichting bij ' + (big ? esc(big.cijfer + big.eenheid) : '') + '*' + I.chevDown + '</button></p>' +
+      '<p class="xs mut fn-t" id="' + id + '" hidden>' + esc(b.voetnoot) + '</p></div>';
+  }
+  function beforeAfter(b) {
+    return '<div class="ba"><div class="ba-t"><p class="xs mut">' + esc(b.voor.label) + '</p><p class="ba-v">' + esc(b.voor.waarde) + '</p><p class="sm mut">vanuit ' + esc(b.voor.vanuit) + '</p></div>' +
+      '<span class="arr" aria-hidden="true">' + I.arrow + '</span>' +
+      '<div class="ba-t na"><p class="xs mut">' + esc(b.na.label) + '</p><p class="ba-v">' + esc(b.na.waarde) + '</p><p class="sm mut">in ' + esc(b.na.in) + '</p></div></div>';
+  }
+  function quote(b) { return '<blockquote class="q"><p>' + esc(b.quote) + '</p><footer class="sm mut">' + esc(b.quoteBron) + '</footer></blockquote>'; }
+  function storyToggle(b, p) {
+    var id = p + '-med-t';
+    return '<div class="row-b">' + cta(b.cta, 'btn-s') + '<button type="button" class="btn btn-t" aria-expanded="false" aria-controls="' + id + '">Het verhaal in het kort' + I.chevDown + '</button></div>' +
+      '<p class="sm mx" id="' + id + '" hidden>' + esc(b.tekst) + '</p>';
+  }
+  function stepsOl(b, cls) {
+    return '<ol class="' + cls + '">' + b.stappen.map(function (s) {
+      return '<li><span class="num" aria-hidden="true">' + s.nummer + '</span><span class="h3"><span class="vh">Stap ' + s.nummer + ': </span>' + esc(s.titel) + '</span></li>';
+    }).join('') + '</ol>';
+  }
+  function partnerCard(it, i, tag, cls) {
+    return '<' + tag + ' class="' + cls + '" data-partner="' + i + '"><span class="badge" hidden>Past bij je voorbeeld</span>' +
+      '<div class="logo"><img src="' + BASE + esc(it.logo) + '" alt="Logo ' + esc(it.naam) + '" loading="lazy"></div>' +
+      '<h3 class="h3">' + esc(it.naam) + '</h3><p class="sm">' + esc(it.tekst) + '</p>' +
+      '<a class="btn btn-s pc-a" href="' + esc(it.url) + '">Bekijk partner<span class="vh"> ' + esc(it.naam) + '</span>' + I.arrow + '</a></' + tag + '>';
+  }
+  function partnerGrid(b, cls) {
+    return '<ul class="pgrid ' + (cls || '') + '">' + b.items.map(function (it, i) { return partnerCard(it, i, 'li', 'card hv pc'); }).join('') + '</ul>';
+  }
+  function accordion(b, p) {
+    return '<div class="acc">' + b.items.map(function (it, i) {
+      return '<div class="acc-i"><h3 class="acc-h"><button type="button" class="acc-b" id="' + p + '-q' + i + '" aria-expanded="false" aria-controls="' + p + '-a' + i + '"><span>' + esc(it.vraag) + '</span>' + I.chevDown + '</button></h3>' +
+        '<div class="acc-p" id="' + p + '-a' + i + '" role="region" aria-labelledby="' + p + '-q' + i + '" hidden><p>' + esc(it.antwoord) + '</p></div></div>';
+    }).join('') + '</div>';
+  }
+  function generic(b) {
+    /* vangnet voor een bloktype dat het CMS later toevoegt: titel plus korte intro, niets gaat verloren */
+    var t = b.titel ? '<h2 class="h2">' + esc(b.titel) + '</h2>' : '';
+    var p = b.intro || b.tekst ? '<p class="mx">' + esc(sentences(b.intro || b.tekst).slice(0, 2).join(' ')) + '</p>' : '';
+    return t || p ? '<div class="blk">' + t + p + '</div>' : '';
+  }
+  function blocks(R) {
+    return DATA.blokken.map(function (b) { return R[b.id] ? R[b.id](b) : generic(b); }).join('');
+  }
+
+  /* ---------- richting A: van signaal naar partner (tijdlijn) ---------- */
+  function step(n, body, o) {
+    o = o || {};
+    var node;
+    if (n === 'start') node = '<div class="tl-node on start" aria-hidden="true"><i></i></div>';
+    else if (n === 'end') node = '<div class="tl-node" aria-hidden="true">' + I.check + '</div>';
+    else node = '<div class="tl-node" aria-hidden="true"><span class="nb">' + n + '</span><span class="nw">' + n + '</span></div>';
+    return '<article class="tl-step' + (n === 'end' ? ' tl-last' : '') + '"' + (o.id ? ' id="' + o.id + '"' : '') + '>' +
+      '<div class="tl-col">' + node + '</div>' +
+      '<div class="tl-body blk' + (o.noRv ? '' : ' rv') + '"' + (o.group ? ' data-group' : '') + '>' + body + '</div></article>';
+  }
+  var RA = {
+    hero: function (b) {
+      return step('start', '<h1 class="h1">' + esc(b.titel) + '</h1><p class="lead mx">' + esc(b.intro) + '</p><p>' + cta(b.cta, 'btn-p') + '</p>' +
+        img(b.beeld, 'hero-img', ' width="1200" height="430"'), { id: 'a-hero', noRv: true });
+    },
+    groeiambities: function (b) {
+      return step(1, '<div class="th"><h2 class="h2">' + esc(b.titel) + '</h2><span class="cnt"><span data-count>0 van ' + b.items.length + '</span> herkend</span></div>' +
+        '<p class="lead mx">' + esc(b.intro) + '</p>' +
+        '<ul class="grid2">' + b.items.map(function (t) { return '<li><button type="button" class="chip" aria-pressed="false" data-chip><span class="box">' + I.check + '</span><span>' + esc(t) + '</span></button></li>'; }).join('') + '</ul>' +
+        '<p class="slot" data-slot hidden>' + esc(b.slot) + '</p>', { id: 'a-groeiambities', group: true });
+    },
+    'wat-doet': function (b) {
+      var pics = [extra('voorraadbeheer'), extra('pickup'), extra('dozen')];
+      return step(2, '<h2 class="h2">' + esc(b.titel) + '</h2><p class="lead mx">' + esc(b.intro) + '</p>' +
+        '<ol class="steps3">' + b.stappen.map(function (s, i) {
+          return '<li class="stp">' + img(pics[i], 'stp-img') + '<span class="num" aria-hidden="true">' + s.nummer + '</span><p class="h3"><span class="vh">Stap ' + s.nummer + ': </span>' + esc(s.titel) + '</p></li>';
+        }).join('') + '</ol>' +
+        '<p class="slot rv">' + esc(b.slot) + '</p>', { id: 'a-wat-doet' });
+    },
+    voordelen: function (b) {
+      return step(3, '<h2 class="h2">' + esc(b.titel) + '</h2>' +
+        '<ul class="ben">' + b.items.map(function (it) {
+          return '<li class="card ben-c"><span class="ben-i">' + (I[it.icoon] || '') + '</span>' +
+            (it.cijfer ? '<p class="big" aria-hidden="true">' + esc(it.cijfer + it.eenheid) + '<sup>*</sup></p>' : '') +
+            '<h3 class="h3">' + esc(it.titel) + '</h3><p class="sm">' + esc(it.tekst) + '</p></li>';
+        }).join('') + '</ul>' + footnote(b, 'a'), { id: 'a-voordelen' });
+    },
+    medisana: function (b) {
+      return step(4, '<h2 class="h2">' + esc(b.titel) + '</h2>' +
+        '<div class="card med"><div class="blk">' + beforeAfter(b) + quote(b) + storyToggle(b, 'a') + '</div>' + img(b.beeld, 'med-img') + '</div>', { id: 'a-medisana' });
+    },
+    ecosysteem: function (b) {
+      return step(5, '<h2 class="h2">' + esc(b.titel) + '</h2><div class="mx">' + linesOf(b.tekst) + '</div>', { id: 'a-ecosysteem' });
+    },
+    'partner-selector': function (b) { return '<div id="' + esc(b.id) + '" class="anchor"></div>'; },
+    selector: function (b) {
+      return step(6, '<div class="scene sel"><div class="blk"><h2 class="h2">' + esc(b.titel) + '</h2><p>' + esc(b.tekst) + '</p>' + checks(b.items) +
+        '<p>' + cta(b.cta, 'btn-w') + '</p></div>' + img(extra('bfc'), 'sel-img') + '</div>', { id: 'a-selector' });
+    },
+    partners: function (b) {
+      return step(7, '<h2 class="h2">' + esc(b.titel) + '</h2><p class="lead">' + esc(b.subtitel) + '</p>' + partnerGrid(b), { id: 'a-partners' });
+    },
+    faq: function (b) {
+      return step(8, '<h2 class="h2">' + esc(b.titel) + '</h2><p class="lead mut">' + esc(b.subtitel) + '</p>' + accordion(b, 'a'), { id: 'a-faq' });
+    }
+  };
+  function renderA() {
+    return '<section class="A" aria-label="Richting A: van signaal naar partner"><div class="wrap"><div class="tl">' +
+      '<div class="tl-rail" aria-hidden="true"><div class="tl-fill"></div></div>' + blocks(RA) +
+      step('end', '<p class="sm mut end-l">Van signaal naar partner</p>', { noRv: true }) +
+      '</div></div></section>';
+  }
+
+  /* ---------- richting B: gesprek ---------- */
+  function bolMsg(inner, cls, attrs) {
+    return '<div class="msg rv"' + (attrs || '') + '><span class="av" aria-hidden="true">bol</span><div class="bub' + (cls ? ' ' + cls : '') + '"><span class="vh">bol: </span>' + inner + '</div></div>';
+  }
+  function meMsg(inner) {
+    return '<div class="msg me rv"><span class="av" aria-hidden="true">jij</span><div class="bub"><span class="vh">jij: </span>' + inner + '</div></div>';
+  }
+  function optsMsg(label, buttons) {
+    return '<div class="msg me rv"><span class="av" aria-hidden="true">jij</span><ul class="opts" aria-label="' + esc(label) + '">' + buttons + '</ul></div>';
+  }
+  var RB = {
+    hero: function (b) {
+      return '<div class="msg"><span class="av" aria-hidden="true">bol</span><div class="bub bub-hero"><span class="vh">bol: </span>' +
+        img(b.beeld, 'bub-img', ' width="1200" height="430"') + '<h1 class="h1">' + esc(b.titel) + '</h1><p class="lead">' + esc(b.intro) + '</p><p>' + cta(b.cta, 'btn-p') + '</p></div></div>';
+    },
+    groeiambities: function (b) {
+      var s = sentences(b.intro);
+      var q = s.length > 1 ? s.slice(1).join(' ') : '';
+      return '<div class="grp" data-group>' +
+        bolMsg('<h2 class="h2">' + esc(b.titel) + '</h2><p>' + esc(s[0]) + '</p>' + (q ? '<p class="h3">' + esc(q) + '</p>' : '')) +
+        optsMsg(q || b.titel, b.items.map(function (t) { return '<li><button type="button" class="opt" aria-pressed="false" data-chip>' + esc(t) + '</button></li>'; }).join('')) +
+        '<div class="msg" data-slot hidden><span class="av" aria-hidden="true">bol</span><div class="bub"><span class="vh">bol: </span><p><span class="cnt"><span data-count>0 van ' + b.items.length + '</span> herkend</span></p><p>' + esc(b.slot) + '</p></div></div>' +
+        '</div>';
+    },
+    'wat-doet': function (b) {
+      return meMsg('<h2 class="h2-q">' + esc(b.titel) + '</h2>') +
+        bolMsg('<p class="h3">' + esc(b.intro) + '</p>' + stepsOl(b, 'ol')) +
+        bolMsg('<p>' + esc(b.slot) + '</p>');
+    },
+    voordelen: function (b) {
+      return meMsg('<p>' + esc(PROMPT.voordelen) + '</p>') +
+        bolMsg('<h2 class="h2">' + esc(b.titel) + '</h2><ul class="rows">' + b.items.map(function (it) {
+          return '<li class="row"><span class="row-i">' + (I[it.icoon] || '') + '</span><div>' +
+            (it.cijfer ? '<p class="big big-s" aria-hidden="true">' + esc(it.cijfer + it.eenheid) + '<sup>*</sup></p>' : '') +
+            '<p class="h3">' + esc(it.titel) + '</p><p class="sm">' + esc(it.tekst) + '</p></div></li>';
+        }).join('') + '</ul>' + footnote(b, 'b'));
+    },
+    medisana: function (b) {
+      return meMsg('<p>' + esc(PROMPT.medisana) + '</p>') +
+        bolMsg('<h2 class="h2">' + esc(b.titel) + '</h2>' + img(b.beeld, 'bub-img bub-img-m') + beforeAfter(b) + quote(b) + storyToggle(b, 'b'));
+    },
+    ecosysteem: function (b) {
+      return meMsg('<p>' + esc(PROMPT.ecosysteem) + '</p>') + bolMsg('<h2 class="h2">' + esc(b.titel) + '</h2>' + linesOf(b.tekst));
+    },
+    'partner-selector': function (b) { return '<div id="' + esc(b.id) + '" class="anchor"></div>'; },
+    selector: function (b) {
+      return bolMsg('<h2 class="h2">' + esc(b.titel) + '</h2><p>' + esc(b.tekst) + '</p>' + checks(b.items) + '<p>' + cta(b.cta, 'btn-w') + '</p>', 'scene') +
+        '<div class="try" data-try aria-live="polite"></div>';
+    },
+    partners: function (b) {
+      return meMsg('<p>' + esc(PROMPT.partners) + '</p>') +
+        bolMsg('<h2 class="h2">' + esc(b.titel) + '</h2><p class="lead">' + esc(b.subtitel) + '</p>' + partnerGrid(b, 'pgrid-2'));
+    },
+    faq: function (b) {
+      return bolMsg('<h2 class="h2">' + esc(b.titel) + '</h2><p class="lead mut">' + esc(b.subtitel) + '</p>') +
+        b.items.map(function (it, i) {
+          return '<div class="msg me rv"><span class="av" aria-hidden="true">jij</span><h3 class="bub-h"><button type="button" class="bub bub-q" id="b-q' + i + '" aria-expanded="false" aria-controls="b-a' + i + '"><span class="vh">jij: </span><span>' + esc(it.vraag) + '</span>' + I.chevDown + '</button></h3></div>' +
+            '<div class="msg" id="b-a' + i + '" role="region" aria-labelledby="b-q' + i + '" hidden><span class="av" aria-hidden="true">bol</span><div class="bub"><span class="vh">bol: </span><p>' + esc(it.antwoord) + '</p></div></div>';
+        }).join('');
+    }
+  };
+  function renderB() {
+    return '<section class="B" aria-label="Richting B: gesprek"><div class="wrap"><div class="chat">' + blocks(RB) + '</div></div></section>';
+  }
+
+  /* ---------- richting C: jouw leverbelofte (dashboard) ---------- */
+  function pn(inner, cls, attrs) {
+    return '<section class="pn rv' + (cls ? ' ' + cls : '') + '"' + (attrs || '') + '>' + inner + '</section>';
+  }
+  var RC = {
+    hero: function (b) {
+      return '<section class="pn hero"><div class="hero-t"><p class="eb">Jouw leverbelofte</p><h1 class="h1">' + esc(b.titel) + '</h1><p class="lead">' + esc(b.intro) + '</p><p>' + cta(b.cta, 'btn-p') + '</p></div>' +
+        img(b.beeld, 'hero-c', ' width="1200" height="430"') + '</section>';
+    },
+    groeiambities: function (b) {
+      return pn('<div class="th"><p class="eb">Signalen</p><span class="cnt"><span data-count>0 van ' + b.items.length + '</span> herkend</span></div>' +
+        '<h2 class="h2">' + esc(b.titel) + '</h2><p>' + esc(b.intro) + '</p>' +
+        '<ul class="cb">' + b.items.map(function (t) { return '<li><label><input type="checkbox" data-cb><span>' + esc(t) + '</span></label></li>'; }).join('') + '</ul>' +
+        '<p class="slot" data-slot hidden>' + esc(b.slot) + '</p>', 's7', ' data-group');
+    },
+    'wat-doet': function (b) {
+      return pn('<p class="eb">Stappen</p><h2 class="h2">' + esc(b.titel) + '</h2><p>' + esc(b.intro) + '</p>' + stepsOl(b, 'st') + '<p class="slot rv">' + esc(b.slot) + '</p>', 's5');
+    },
+    voordelen: function (b) {
+      return '<div class="hd"><h2 class="h2">' + esc(b.titel) + '</h2></div>' + b.items.map(function (it, i) {
+        return pn('<div class="th"><p class="eb">' + esc(PNAME[it.icoon] || '') + '</p><span class="pn-i">' + (I[it.icoon] || '') + '</span></div>' +
+          (it.cijfer ? '<p class="big" aria-hidden="true">' + esc(it.cijfer + it.eenheid) + '<sup>*</sup></p>' : '') +
+          '<h3 class="h3">' + esc(it.titel) + '</h3><p class="sm">' + esc(it.tekst) + '</p>' + (it.cijfer ? footnote(b, 'c') : ''), i < 3 ? 's4' : 's6');
+      }).join('');
+    },
+    medisana: function (b) {
+      return pn('<div class="med2"><div class="blk"><p class="eb">Voor en na</p><h2 class="h2">' + esc(b.titel) + '</h2>' + beforeAfter(b) + quote(b) + storyToggle(b, 'c') + '</div>' + img(b.beeld, 'med2-img') + '</div>', 's8');
+    },
+    ecosysteem: function (b) {
+      return pn('<p class="eb">Ecosysteem</p><h2 class="h2">' + esc(b.titel) + '</h2>' + linesOf(b.tekst), 's4');
+    },
+    'partner-selector': function (b) { return '<div id="' + esc(b.id) + '" class="anchor"></div>'; },
+    selector: function (b) {
+      var qs = b.vragenVoorbeeld || [];
+      return pn('<div class="sel2"><div class="blk"><p class="eb">Partner Selector</p><h2 class="h2">' + esc(b.titel) + '</h2><p>' + esc(b.tekst) + '</p>' + checks(b.items) + '<p>' + cta(b.cta, 'btn-w') + '</p></div>' +
+        (qs.length ? '<div class="sels"><p class="sm"><span class="tag">voorbeeld</span> Vier voorbeeldvragen: je keuze markeert hieronder de passende partners.</p>' +
+          qs.map(function (q, i) {
+            return '<label><span>' + esc(q.vraag) + '</span><select data-q="' + i + '"><option value="">Maak een keuze</option>' + q.opties.map(function (o) { return '<option>' + esc(o) + '</option>'; }).join('') + '</select></label>';
+          }).join('') + '<p class="sm" data-fcount aria-live="polite"></p></div>' : '') + '</div>', 'scene s12');
+    },
+    partners: function (b) {
+      return '<div class="hd"><h2 class="h2">' + esc(b.titel) + '</h2><p class="lead">' + esc(b.subtitel) + '</p></div>' +
+        b.items.map(function (it, i) { return partnerCard(it, i, 'section', 'pn rv s3 pp hv'); }).join('');
+    },
+    faq: function (b) {
+      return pn('<p class="eb">Vragen</p><h2 class="h2">' + esc(b.titel) + '</h2><p class="lead mut">' + esc(b.subtitel) + '</p>' + accordion(b, 'c'), 's12');
+    }
+  };
+  function renderC() {
+    return '<section class="C" aria-label="Richting C: jouw leverbelofte"><div class="wrap"><div class="db">' + blocks(RC) + '</div></div></section>';
+  }
+
+  /* ---------- gedrag ---------- */
+  function popIn(el) { if (reduced) return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+
+  function initToggles(root) {
+    var btns = root.querySelectorAll('[aria-controls][aria-expanded]');
+    Array.prototype.forEach.call(btns, function (b) {
+      b.addEventListener('click', function () {
+        var t = root.querySelector('#' + b.getAttribute('aria-controls'));
+        if (!t) return;
+        var open = b.getAttribute('aria-expanded') === 'true';
+        b.setAttribute('aria-expanded', open ? 'false' : 'true');
+        t.hidden = open;
+        if (!open) popIn(t);
+      });
+    });
+  }
+
+  function initGroups(root) {
+    Array.prototype.forEach.call(root.querySelectorAll('[data-group]'), function (g) {
+      var slot = g.querySelector('[data-slot]');
+      var cnt = g.querySelector('[data-count]');
+      var ctrls = Array.prototype.slice.call(g.querySelectorAll('[data-chip],[data-cb]'));
+      function on(c) { return c.hasAttribute('data-chip') ? c.getAttribute('aria-pressed') === 'true' : c.checked; }
+      function upd() {
+        var n = ctrls.filter(on).length;
+        if (cnt) cnt.textContent = n + ' van ' + ctrls.length;
+        ctrls.forEach(function (c) { if (c.hasAttribute('data-cb')) c.closest('label').classList.toggle('chd', c.checked); });
+        if (slot) {
+          var was = !slot.hidden;
+          slot.hidden = n === 0;
+          if (!was && n > 0) popIn(slot);
+        }
+      }
+      ctrls.forEach(function (c) {
+        if (c.hasAttribute('data-chip')) {
+          c.addEventListener('click', function () { c.setAttribute('aria-pressed', on(c) ? 'false' : 'true'); upd(); });
+        } else {
+          c.addEventListener('change', upd);
+        }
+      });
+      upd();
+    });
+  }
+
+  function initReveal(root) {
+    if (io) { io.disconnect(); io = null; }
+    if (!reduced && 'IntersectionObserver' in window) {
+      io = new IntersectionObserver(function (es) {
+        es.forEach(function (x) { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } });
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.01 });
+    }
+    observeNew(root);
+  }
+  function observeNew(root) {
+    var els = root.querySelectorAll('.rv:not(.in)');
+    Array.prototype.forEach.call(els, function (e) { if (io) io.observe(e); else e.classList.add('in'); });
+  }
+
+  function initTimeline(root) {
+    var rail = root.querySelector('.tl-rail');
+    if (!rail) return;
+    var fill = rail.querySelector('.tl-fill');
+    var nodes = Array.prototype.slice.call(root.querySelectorAll('.tl-node:not(.start)'));
+    if (reduced) { fill.style.transform = 'scaleY(1)'; nodes.forEach(function (n) { n.classList.add('on'); }); return; }
+    var tick = false;
+    function upd() {
+      tick = false;
+      var r = rail.getBoundingClientRect();
+      var mid = window.innerHeight * 0.55;
+      var p = r.height > 0 ? Math.max(0, Math.min(1, (mid - r.top) / r.height)) : 0;
+      fill.style.transform = 'scaleY(' + p.toFixed(4) + ')';
+      nodes.forEach(function (n) { var nr = n.getBoundingClientRect(); n.classList.toggle('on', nr.top + nr.height / 2 <= mid); });
+    }
+    function req() { if (!tick) { tick = true; window.requestAnimationFrame(upd); } }
+    window.addEventListener('scroll', req, { passive: true });
+    window.addEventListener('resize', req);
+    upd();
+    cleanup.push(function () { window.removeEventListener('scroll', req); window.removeEventListener('resize', req); });
+  }
+
+  function initTry(root) {
+    var box = root.querySelector('[data-try]');
+    if (!box) return;
+    var sel = blk('selector'), par = blk('partners');
+    var qs = (sel && sel.vragenVoorbeeld) || [];
+    if (!qs.length || !par) { box.parentNode.removeChild(box); return; }
+    var ans = [];
+    function draw(focus) {
+      var h = bolMsg('<p><span class="tag">voorbeeld</span></p><p class="h3">Vier voorbeeldvragen, om alvast een idee te krijgen.</p>');
+      qs.forEach(function (q, i) {
+        if (i > ans.length) return;
+        h += bolMsg('<p class="h3">' + esc(q.vraag) + '</p>');
+        if (i < ans.length) h += meMsg('<p>' + esc(ans[i]) + '</p>');
+        else h += optsMsg(q.vraag, q.opties.map(function (o) { return '<li><button type="button" class="opt" data-pick="' + esc(o) + '">' + esc(o) + '</button></li>'; }).join(''));
+      });
+      if (ans.length === qs.length) {
+        var sc = par.items.map(function (p) {
+          var s = 0;
+          KEYS.forEach(function (k, i) { if (((p.profiel || {})[k] || []).indexOf(ans[i]) >= 0) s++; });
+          return { p: p, s: s };
+        });
+        var best = Math.max.apply(null, sc.map(function (x) { return x.s; }));
+        var top = sc.filter(function (x) { return x.s === best; });
+        h += bolMsg('<p><span class="tag">voorbeeld</span></p><p class="h3">Deze partners passen het best bij je antwoorden</p>' +
+          '<ul class="pills">' + top.map(function (x) { return '<li><a class="btn btn-s" href="' + esc(x.p.url) + '">' + esc(x.p.naam) + I.arrow + '</a></li>'; }).join('') + '</ul>' +
+          '<p class="sm mut">' + best + ' van ' + qs.length + ' antwoorden passen. De echte Partner Selector staat hierboven.</p>' +
+          '<p><button type="button" class="btn btn-t" data-reset>Opnieuw' + I.reset + '</button></p>');
+      }
+      box.innerHTML = h;
+      observeNew(box);
+      Array.prototype.forEach.call(box.querySelectorAll('[data-pick]'), function (b) {
+        b.addEventListener('click', function () { ans.push(b.getAttribute('data-pick')); draw(true); });
+      });
+      var r = box.querySelector('[data-reset]');
+      if (r) r.addEventListener('click', function () { ans = []; draw(true); });
+      if (focus) { var f = box.querySelector('[data-pick],[data-reset]'); if (f) f.focus({ preventScroll: true }); }
+    }
+    draw(false);
+  }
+
+  function initFilter(root) {
+    var sels = Array.prototype.slice.call(root.querySelectorAll('[data-q]'));
+    if (!sels.length) return;
+    var cards = Array.prototype.slice.call(root.querySelectorAll('[data-partner]'));
+    var out = root.querySelector('[data-fcount]');
+    var par = blk('partners');
+    function apply() {
+      var ans = sels.map(function (s) { return s.value; });
+      var n = ans.filter(Boolean).length;
+      var hits = 0;
+      cards.forEach(function (c, i) {
+        var p = par.items[i];
+        var s = 0;
+        ans.forEach(function (a, k) { if (a && (((p && p.profiel) || {})[KEYS[k]] || []).indexOf(a) >= 0) s++; });
+        var match = n > 0 && s === n;
+        if (match) hits++;
+        c.classList.toggle('match', match);
+        c.classList.toggle('dim', n > 0 && !match);
+        var bd = c.querySelector('.badge');
+        if (bd) bd.hidden = !match;
+      });
+      if (out) out.textContent = n ? hits + ' van ' + cards.length + ' partners passen bij je voorbeeld.' : '';
+    }
+    sels.forEach(function (s) { s.addEventListener('change', apply); });
+  }
+
+  function wire() {
+    initToggles(stage);
+    initGroups(stage);
+    initReveal(stage);
+    initTimeline(stage);
+    initTry(stage);
+    initFilter(stage);
+  }
+
+  /* ---------- schakelen en hash ---------- */
+  var RENDER = { a: renderA, b: renderB, c: renderC };
+  function dirFromHash() {
+    var h = (window.location.hash || '').replace('#', '').toLowerCase();
+    return DIRS.indexOf(h) >= 0 ? h : null;
+  }
+  function headerOffset() {
+    var hh = window.BolShell ? window.BolShell.headerHeight() : 0;
+    var sw = document.querySelector('.sw');
+    return hh + (sw ? sw.getBoundingClientRect().height : 0);
+  }
+  function show(dir) {
+    cleanup.forEach(function (f) { f(); });
+    cleanup = [];
+    cur = dir;
+    stage.innerHTML = RENDER[dir]();
+    stage.setAttribute('aria-labelledby', 'tab-' + dir);
+    tabs.forEach(function (t) {
+      var on = t.getAttribute('data-dir') === dir;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+    });
+    wire();
+  }
+  function toTop() {
+    var main = document.getElementById('inhoud');
+    var y = main.getBoundingClientRect().top + window.pageYOffset - (window.BolShell ? window.BolShell.headerHeight() : 0);
+    window.scrollTo({ top: Math.max(0, y), behavior: reduced ? 'auto' : 'smooth' });
+  }
+  function handleAnchor() {
+    var h = (window.location.hash || '').slice(1);
+    if (!h || DIRS.indexOf(h) >= 0) return;
+    var el = document.getElementById(h);
+    if (!el) return;
+    var y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset() - 16;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'auto' });
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      var d = t.getAttribute('data-dir');
+      if (!DATA || d === cur) return;
+      show(d);
+      if (window.history && window.history.replaceState) window.history.replaceState(null, '', '#' + d);
+      toTop();
+    });
+  });
+  var tablist = document.querySelector('[role="tablist"]');
+  tablist.addEventListener('keydown', function (e) {
+    var i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    var j = null;
+    if (e.key === 'ArrowRight') j = (i + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft') j = (i + tabs.length - 1) % tabs.length;
+    else if (e.key === 'Home') j = 0;
+    else if (e.key === 'End') j = tabs.length - 1;
+    if (j === null) return;
+    e.preventDefault();
+    tabs[j].focus();
+    tabs[j].click();
+  });
+  window.addEventListener('hashchange', function () {
+    if (!DATA) return;
+    var d = dirFromHash();
+    if (d && d !== cur) { show(d); toTop(); }
+    else handleAnchor();
+  });
+
+  fetch(BASE + 'content.json')
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function (d) {
+      DATA = d;
+      show(dirFromHash() || 'a');
+      handleAnchor();
+    })
+    .catch(function () {
+      stage.innerHTML = '<div class="wrap"><p class="err">De inhoud (content.json) kon niet geladen worden. Open deze pagina via http://localhost:8080/bol-skills/varianten/huashu.html</p></div>';
+    });
+})();
+</script>
+</body>
+</html>

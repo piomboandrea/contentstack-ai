@@ -1,0 +1,567 @@
+<!doctype html>
+<!--
+  Skill: image-to-code-skill. Spectrum: "Leuk en vernieuwend". Concept: "Geillustreerd magazijn": de hele pagina is een
+  magazijn in bol-blauwe lijn- en vlakstijl, zelf getekend in SVG en CSS (geen foto's), en elk blok uit content.json is een
+  zone ervan: de 6 situaties als bordjes aan de ingang, de 3 stappen als zones met een vignet, de 5 voordelen als etiketten op
+  dozen op een plank, Medisana als laadperron met voor en na, de selector als loket, de 4 partners als stations op een rail en
+  de FAQ als prikbord met briefjes die openklappen. Referentiebeelden: de skill vraagt eerst beelden te genereren, maar beide
+  pogingen mislukten (Gemini: quota 0 op gemini-3.1-flash-image en gemini-2.5-flash-image; ChatGPT-client: composer-timeout),
+  dus er zijn geen image-to-code-ref-*.png en de pagina is rechtstreeks gebouwd op de principes van de skill (schone hero,
+  geen cards in cards, veel lucht, lange tekst achter een klik). Keuzes: hero met titel, een zin en een knop naast het grote
+  magazijn met een traag lopende band; lange copy (Medisana, voetnoot, FAQ-antwoorden) achter aria-expanded-knoppen; partners
+  op gsm als scroll-snap-carrousel. Overwogen alternatieven: de bol-foto's uit img/ als beeld in de Medisana-zone, een
+  klikbare plattegrond als navigatie boven de zones, en de voorbeeldvragen van de selector als bordje aan het loket.
+-->
+<html lang="nl-NL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bol fulfilmentpartners: image-to-code-skill</title>
+<meta name="description" content="Ontdek Fulfilment Partners via bol, als geillustreerd magazijn.">
+<style>
+  .itc, .itc *, .itc *::before, .itc *::after { box-sizing: border-box; }
+  .itc { color: var(--bol-ink); font: 400 16px/24px var(--bol-font-body); overflow-x: hidden; }
+  .itc [hidden] { display: none !important; }
+  .itc .wrap { max-width: var(--bol-container); margin: 0 auto; padding: 0 16px; }
+  .itc section { padding: 56px 0; }
+  .itc section.tight { padding: 40px 0; }
+  .itc .anchor { scroll-margin-top: calc(var(--bol-header-h) + 16px); }
+  .itc :focus-visible { outline: 2px solid var(--bol-blue-action); outline-offset: 2px; }
+  .itc .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* typografie */
+  .itc h1 { font: 900 40px/48px var(--bol-font-display); color: var(--bol-blue); margin: 0 0 16px; letter-spacing: -.01em; }
+  .itc h2 { font: 700 28px/36px var(--bol-font-display); color: var(--bol-blue); margin: 0 0 12px; max-width: 24ch; }
+  .itc h3 { font: 700 20px/28px var(--bol-font-display); color: var(--bol-blue); margin: 0 0 8px; }
+  .itc p { margin: 0; }
+  .itc .lead { font-size: 18px; line-height: 28px; max-width: 620px; }
+  .itc .muted { color: var(--bol-ink-medium); }
+  .itc .small { font-size: 14px; line-height: 20px; }
+  .itc .head { margin-bottom: 32px; }
+  .itc .head .lead { margin-top: 4px; }
+  .itc .after { margin-top: 24px; max-width: 620px; }
+
+  /* knoppen en links */
+  .itc .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 24px; border-radius: var(--bol-radius-2); font: 600 14px/20px var(--bol-font-body); text-decoration: none; cursor: pointer; border: 1px solid transparent; transition: background-color .15s, box-shadow .15s, color .15s; white-space: nowrap; }
+  .itc .btn-primary { background: var(--bol-blue-action); color: #fff; }
+  .itc .btn-primary:hover { background: var(--bol-blue-hover); box-shadow: var(--bol-shadow-2); }
+  .itc .btn-secondary { background: #fff; color: var(--bol-blue-action); border-color: var(--bol-blue-action); }
+  .itc .btn-secondary:hover { box-shadow: var(--bol-shadow-2); background: var(--bol-blue-minimal); }
+  .itc .btn .ic { flex: none; }
+  .itc .link { display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; padding: 0; font: 600 16px/24px var(--bol-font-body); color: var(--bol-blue-action); cursor: pointer; text-decoration: none; }
+  .itc .link:hover { color: var(--bol-blue-hover); text-decoration: underline; }
+  .itc .link .ic { transition: transform .2s; }
+  .itc .link.open .ic.chev-d { transform: rotate(180deg); }
+  .itc .ic { width: 24px; height: 24px; flex: none; display: block; }
+  .itc .actions { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center; margin-top: 24px; }
+
+  /* onthulling bij scrollen, enkel transform en opacity */
+  .itc .rv { opacity: 0; transform: translateY(18px); transition: opacity .55s ease, transform .55s ease; }
+  .itc .rv.in { opacity: 1; transform: none; }
+
+  /* 1. hero: het magazijn */
+  .itc .hero { padding-top: 24px; padding-bottom: 40px; }
+  .itc .hero .wrap { display: grid; gap: 32px; align-items: center; }
+  .itc .hero-text .btn { margin-top: 24px; }
+  .itc .hero-art svg { width: 100%; height: auto; display: block; }
+  .itc .warehouse .parcels { animation: belt 6s linear infinite; }
+  @keyframes belt { from { transform: translateX(0); } to { transform: translateX(72px); } }
+
+  /* 2. ingang: bordjes aan een balk */
+  .itc .gate { position: relative; padding-top: 52px; }
+  .itc .gate::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 12px; border-radius: 6px; background: var(--bol-blue); }
+  .itc .signs { display: grid; gap: 40px 24px; grid-template-columns: 1fr; list-style: none; margin: 0; padding: 0; }
+  .itc .sign { position: relative; background: #fff; border: 2px solid var(--bol-blue); border-radius: var(--bol-radius-4); padding: 20px 24px; font-weight: 600; color: var(--bol-blue); min-height: 88px; display: flex; align-items: center; }
+  .itc .sign::before, .itc .sign::after { content: ""; position: absolute; top: -42px; width: 2px; height: 40px; background: var(--bol-blue); }
+  .itc .sign::before { left: 28px; } .itc .sign::after { right: 28px; }
+
+  /* 3. zones: stap 1, 2, 3 */
+  .itc .zones { display: grid; gap: 24px; grid-template-columns: 1fr; list-style: none; margin: 0; padding: 0; }
+  .itc .zone { background: var(--bol-blue-minimal); border-radius: var(--bol-radius-6); padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+  .itc .zone svg { width: 100%; max-width: 280px; height: auto; display: block; margin: 0 auto 8px; }
+  .itc .zone .num { font: 300 56px/56px var(--bol-font-display); color: var(--bol-blue-action); }
+  .itc .zone h3 { margin: 0; }
+
+  /* 4. plank met dozen en etiketten */
+  .itc .shelf { display: grid; gap: 24px; grid-template-columns: 1fr; list-style: none; margin: 0; padding: 0 16px; border-bottom: 10px solid var(--bol-blue); align-items: stretch; }
+  .itc .crate { display: flex; flex-direction: column; background: var(--bol-blue-low); border: 2px solid var(--bol-blue); border-bottom: 0; border-radius: var(--bol-radius-2) var(--bol-radius-2) 0 0; }
+  .itc .crate .lid { height: 24px; border-bottom: 2px solid var(--bol-blue); position: relative; flex: none; }
+  .itc .crate .lid::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 12px; margin-left: -6px; background: #fff; border-left: 2px solid var(--bol-blue); border-right: 2px solid var(--bol-blue); }
+  .itc .label { margin: 12px 12px 20px; background: #fff; border-radius: var(--bol-radius-2); padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .itc .label .ic { color: var(--bol-blue-action); margin-bottom: 4px; }
+  .itc .label h3 { font-size: 18px; line-height: 26px; }
+  .itc .label .big { display: block; font: 300 48px/48px var(--bol-font-display); color: var(--bol-blue-action); margin: 2px 0; }
+  .itc .label p { color: var(--bol-ink-medium); font-size: 15px; line-height: 22px; }
+  .itc .foot { margin-top: 24px; max-width: 720px; }
+  .itc .foot p { margin-top: 12px; }
+
+  /* 5. laadperron: voor en na */
+  .itc .dock { display: grid; gap: 16px; grid-template-columns: 1fr; align-items: end; }
+  .itc .bay { background: var(--bol-blue-minimal); border-radius: var(--bol-radius-6) var(--bol-radius-6) 0 0; padding: 24px 24px 20px; border-bottom: 10px solid var(--bol-blue); }
+  .itc .bay svg { width: 180px; max-width: 100%; height: auto; display: block; margin-bottom: 16px; }
+  .itc .bay .lbl { font: 600 14px/20px var(--bol-font-body); color: var(--bol-ink-medium); }
+  .itc .bay .val { font: 900 32px/40px var(--bol-font-display); color: var(--bol-blue); }
+  .itc .bay.now .val { color: var(--bol-blue-action); }
+  .itc .dock-arrow { display: flex; justify-content: center; align-items: center; color: var(--bol-blue-action); padding: 0 0 24px; }
+  .itc .dock-arrow .ic { width: 40px; height: 40px; transform: rotate(90deg); }
+  .itc .story { display: grid; gap: 24px; margin-top: 32px; }
+  .itc blockquote { margin: 0; padding: 4px 0 4px 20px; border-left: 4px solid var(--bol-blue-action); font: 700 22px/32px var(--bol-font-display); color: var(--bol-blue); max-width: 720px; }
+  .itc figcaption { margin-top: 8px; font: 600 14px/20px var(--bol-font-body); color: var(--bol-ink-medium); }
+  .itc .story-more { max-width: 720px; }
+
+  /* 6. wegwijzer naar het loket */
+  .itc .eco .wrap { display: grid; gap: 24px; align-items: center; }
+  .itc .eco svg { width: 120px; height: auto; display: block; }
+  .itc .wegwijzer { display: inline-block; margin-top: 20px; text-decoration: none; color: var(--bol-blue); font-weight: 600; max-width: 620px; }
+  .itc .wegwijzer span { display: block; background: var(--bol-blue-low); padding: 14px 40px 14px 20px; border-radius: var(--bol-radius-2); clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%); transition: background-color .15s; }
+  .itc .wegwijzer:hover span { background: #c1d5ff; }
+
+  /* 7. loket: volle breedte lichtblauw */
+  .itc .loket-band { background: var(--bol-blue-low); }
+  .itc .loket { display: grid; gap: 32px; align-items: center; }
+  .itc .loket svg { width: 240px; max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  .itc .checks { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; }
+  .itc .checks li { display: flex; gap: 12px; align-items: flex-start; }
+  .itc .checks .ic { color: var(--bol-blue-action); }
+
+  /* 8. stations op een rail */
+  .itc .rail { position: relative; }
+  .itc .rail::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; border-top: 2px dashed var(--bol-blue); }
+  .itc .stations { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; list-style: none; margin: 0; padding: 28px 0 12px; -webkit-overflow-scrolling: touch; }
+  .itc .station { position: relative; flex: 0 0 84%; scroll-snap-align: start; background: #fff; border-radius: var(--bol-radius-4); box-shadow: var(--bol-shadow-1); border: 2px solid transparent; padding: 24px; display: flex; flex-direction: column; gap: 8px; transition: border-color .15s, box-shadow .15s; }
+  .itc .station::before { content: ""; position: absolute; top: -29px; left: 50%; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 3px solid var(--bol-blue); margin-left: -10px; }
+  .itc .station:hover, .itc .station:focus-within { border-color: var(--bol-blue-action); box-shadow: var(--bol-shadow-2); }
+  .itc .station .logo { height: 64px; display: flex; align-items: center; margin-bottom: 8px; }
+  .itc .station .logo img { max-height: 56px; max-width: 150px; width: auto; height: auto; object-fit: contain; display: block; }
+  .itc .station p { color: var(--bol-ink-medium); flex: 1; }
+  .itc .station .link { margin-top: 8px; }
+
+  /* 9. prikbord */
+  .itc .board { background: var(--bol-blue-minimal); border-radius: var(--bol-radius-6); padding: 24px 20px; display: grid; gap: 24px; grid-template-columns: 1fr; list-style: none; margin: 0; align-items: start; }
+  .itc .note { position: relative; background: #fff; border-radius: var(--bol-radius-2); box-shadow: var(--bol-shadow-1); padding: 32px 20px 20px; }
+  .itc .note::before { content: ""; position: absolute; top: 10px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--bol-blue-action); box-shadow: inset 0 -3px 0 rgba(0,0,60,.25); }
+  .itc .note:nth-child(3n+1) { transform: rotate(-.6deg); }
+  .itc .note:nth-child(3n+2) { transform: rotate(.5deg); }
+  .itc .note:nth-child(3n) { transform: rotate(-.3deg); }
+  .itc .note h3 { margin: 0; }
+  .itc .note .q { display: flex; width: 100%; gap: 12px; align-items: flex-start; justify-content: space-between; text-align: left; background: none; border: 0; padding: 0; font: 700 18px/26px var(--bol-font-display); color: var(--bol-blue); cursor: pointer; }
+  .itc .note .q .ic { color: var(--bol-blue-action); transition: transform .2s; margin-top: 1px; }
+  .itc .note .q[aria-expanded="true"] .ic { transform: rotate(180deg); }
+  .itc .note .a { margin-top: 12px; color: var(--bol-ink); }
+
+  @media (min-width: 640px) {
+    .itc .signs { grid-template-columns: repeat(2, 1fr); }
+    .itc .shelf { grid-template-columns: repeat(2, 1fr); }
+    .itc .board { grid-template-columns: repeat(2, 1fr); padding: 32px; }
+    .itc .station { flex-basis: 60%; }
+  }
+  @media (min-width: 768px) {
+    .itc section { padding: 80px 0; }
+    .itc section.tight { padding: 48px 0; }
+    .itc h1 { font-size: 44px; line-height: 52px; }
+    .itc h2 { font-size: 32px; line-height: 40px; }
+    .itc .hero { padding-top: 32px; padding-bottom: 56px; }
+    .itc .hero-art svg { max-width: 720px; margin: 0 auto; }
+    .itc .dock { grid-template-columns: 1fr auto 1fr; gap: 24px; }
+    .itc .dock-arrow { padding: 0 8px 32px; }
+    .itc .dock-arrow .ic { transform: none; }
+    .itc .eco .wrap { grid-template-columns: 1fr auto; }
+    .itc .loket { grid-template-columns: 1fr 2fr; gap: 48px; }
+    .itc .stations { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; overflow: visible; padding-bottom: 0; }
+    .itc .station { flex-basis: auto; }
+  }
+  @media (min-width: 1024px) {
+    .itc h1 { font-size: 52px; line-height: 60px; }
+    .itc h2 { font-size: 36px; line-height: 44px; }
+    .itc .hero .wrap { grid-template-columns: 5fr 7fr; gap: 48px; }
+    .itc .hero-art svg { max-width: none; }
+    .itc .signs { grid-template-columns: repeat(3, 1fr); }
+    .itc .zones { grid-template-columns: repeat(3, 1fr); }
+    .itc .shelf { grid-template-columns: repeat(5, 1fr); padding: 0 24px; }
+    .itc .stations { grid-template-columns: repeat(4, 1fr); }
+    .itc .board { grid-template-columns: repeat(3, 1fr); padding: 40px; }
+    .itc .loket { grid-template-columns: 1fr 2fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .itc .rv { opacity: 1; transform: none; transition: none; }
+    .itc .warehouse .parcels { animation: none; }
+    .itc * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<script src="../bol-shell.js"></script>
+<main class="bolx-content itc">
+  <div id="app"></div>
+
+  <!-- gedeelde SVG-symbolen (dozen) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="s-box" viewBox="0 0 40 36">
+        <rect x="1" y="1" width="38" height="34" rx="3" fill="#D2E1FF" stroke="#0000A4" stroke-width="2"/>
+        <path d="M20 1v34M1 11h38" fill="none" stroke="#0000A4" stroke-width="2"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- hero: het hele magazijn -->
+  <template id="art-hero">
+    <svg class="warehouse" viewBox="0 0 640 400" role="img" aria-labelledby="art-hero-t">
+      <title id="art-hero-t">Getekend magazijn met stellingen vol dozen, een lopende band en een bestelwagen aan het laadperron</title>
+      <defs><clipPath id="belt-clip"><rect x="300" y="276" width="160" height="44"/></clipPath></defs>
+      <g stroke="#0000A4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none">
+        <rect x="0" y="340" width="640" height="60" rx="12" fill="#EDF3FF" stroke="none"/>
+        <path d="M8 340h624"/>
+        <path d="M40 340V96q0-16 16-16h388q16 0 16 16v244" fill="#fff"/>
+        <path d="M24 80 104 34h292l80 46Z" fill="#D2E1FF"/>
+        <path d="M250 34V6"/>
+        <path d="M250 8h24l-6 7 6 7h-24Z" fill="#0000A4"/>
+        <rect x="60" y="100" width="380" height="8" rx="4" fill="#D2E1FF" stroke="none"/>
+        <path d="M70 130v210M170 130v210M70 190h100M70 250h100M70 310h100"/>
+        <use href="#s-box" x="76" y="154" width="40" height="36"/><use href="#s-box" x="124" y="154" width="40" height="36"/>
+        <use href="#s-box" x="76" y="214" width="40" height="36"/><use href="#s-box" x="124" y="214" width="40" height="36"/>
+        <use href="#s-box" x="76" y="274" width="40" height="36"/>
+        <path d="M190 130v210M290 130v210M190 190h100M190 250h100M190 310h100"/>
+        <use href="#s-box" x="244" y="154" width="40" height="36"/>
+        <use href="#s-box" x="196" y="214" width="40" height="36"/><use href="#s-box" x="244" y="214" width="40" height="36"/>
+        <use href="#s-box" x="196" y="274" width="40" height="36"/><use href="#s-box" x="244" y="274" width="40" height="36"/>
+        <path d="M420 340V216q0-16 16-16h24v140" fill="#EDF3FF"/>
+        <g clip-path="url(#belt-clip)"><g class="parcels">
+          <use href="#s-box" x="228" y="290" width="32" height="28"/><use href="#s-box" x="300" y="290" width="32" height="28"/>
+          <use href="#s-box" x="372" y="290" width="32" height="28"/><use href="#s-box" x="444" y="290" width="32" height="28"/>
+        </g></g>
+        <rect x="300" y="318" width="160" height="16" rx="8" fill="#fff"/>
+        <circle cx="316" cy="326" r="4" fill="#D2E1FF"/><circle cx="340" cy="326" r="4" fill="#D2E1FF"/><circle cx="364" cy="326" r="4" fill="#D2E1FF"/>
+        <circle cx="388" cy="326" r="4" fill="#D2E1FF"/><circle cx="412" cy="326" r="4" fill="#D2E1FF"/><circle cx="436" cy="326" r="4" fill="#D2E1FF"/>
+        <path d="M316 334v6M444 334v6"/>
+        <path d="M460 340v-14h36v14" fill="#D2E1FF"/>
+        <path d="M504 256l-20-10v70l20 10"/>
+        <rect x="504" y="248" width="80" height="72" rx="6" fill="#fff"/>
+        <path d="M584 268h22q10 0 14 10l6 16v26h-42Z" fill="#D2E1FF"/>
+        <rect x="590" y="274" width="22" height="16" rx="3" fill="#fff"/>
+        <circle cx="621" cy="308" r="3" fill="#fff"/>
+        <circle cx="528" cy="328" r="12" fill="#fff"/><circle cx="528" cy="328" r="4" fill="#D2E1FF"/>
+        <circle cx="600" cy="328" r="12" fill="#fff"/><circle cx="600" cy="328" r="4" fill="#D2E1FF"/>
+      </g>
+    </svg>
+  </template>
+
+  <!-- zones -->
+  <template id="art-zone-1">
+    <svg viewBox="0 0 200 120" aria-hidden="true" focusable="false"><g stroke="#0000A4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none">
+      <path d="M8 104h184"/>
+      <path d="M40 24v80M140 24v80M40 52h100M40 80h100"/>
+      <use href="#s-box" x="48" y="20" width="36" height="32"/><use href="#s-box" x="92" y="20" width="36" height="32"/>
+      <use href="#s-box" x="48" y="48" width="36" height="32"/>
+      <use href="#s-box" x="48" y="72" width="36" height="32"/><use href="#s-box" x="92" y="72" width="36" height="32"/>
+      <use href="#s-box" x="152" y="72" width="36" height="32"/>
+    </g></svg>
+  </template>
+  <template id="art-zone-2">
+    <svg viewBox="0 0 200 120" aria-hidden="true" focusable="false"><g stroke="#0000A4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none">
+      <path d="M8 104h184"/>
+      <rect x="16" y="60" width="84" height="8" rx="4" fill="#D2E1FF"/>
+      <path d="M24 68v36M92 68v36"/>
+      <use href="#s-box" x="38" y="28" width="36" height="32"/>
+      <circle cx="86" cy="52" r="7" fill="#fff"/><circle cx="86" cy="52" r="2.5" fill="#D2E1FF"/>
+      <rect x="110" y="86" width="80" height="12" rx="6" fill="#fff"/>
+      <circle cx="122" cy="92" r="3" fill="#D2E1FF"/><circle cx="140" cy="92" r="3" fill="#D2E1FF"/><circle cx="158" cy="92" r="3" fill="#D2E1FF"/><circle cx="176" cy="92" r="3" fill="#D2E1FF"/>
+      <path d="M120 98v6M180 98v6"/>
+      <use href="#s-box" x="124" y="58" width="32" height="28"/>
+      <path d="M156 36h30m-8-8l8 8-8 8"/>
+    </g></svg>
+  </template>
+  <template id="art-zone-3">
+    <svg viewBox="0 0 200 120" aria-hidden="true" focusable="false"><g stroke="#0000A4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none">
+      <path d="M8 104h184"/>
+      <rect x="30" y="66" width="92" height="38" rx="4" fill="#D2E1FF"/>
+      <rect x="24" y="58" width="104" height="10" rx="5" fill="#fff"/>
+      <use href="#s-box" x="58" y="26" width="36" height="32"/>
+      <path d="M186 60a24 24 0 1 1-24-24" stroke-width="3"/>
+      <path d="M154 28l8 8-8 8" stroke-width="3"/>
+    </g></svg>
+  </template>
+
+  <!-- laadperron: vrachtwagen (vroeger) en bestelwagen (nu) -->
+  <template id="art-lorry">
+    <svg viewBox="0 0 130 60" aria-hidden="true" focusable="false"><g stroke="#0000A4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none">
+      <rect x="4" y="8" width="78" height="38" rx="4" fill="#D2E1FF"/>
+      <path d="M82 20h20q8 0 11 8l5 10v8H82Z" fill="#fff"/>
+      <rect x="88" y="25" width="14" height="10" rx="2" fill="#EDF3FF"/>
+      <circle cx="24" cy="48" r="7" fill="#fff"/><circle cx="24" cy="48" r="2.5" fill="#D2E1FF"/>
+      <circle cx="44" cy="48" r="7" fill="#fff"/><circle cx="44" cy="48" r="2.5" fill="#D2E1FF"/>
+      <circle cx="100" cy="48" r="7" fill="#fff"/><circle cx="100" cy="48" r="2.5" fill="#D2E1FF"/>
+      <path d="M2 56h126"/>
+    </g></svg>
+  </template>
+  <template id="art-van">
+    <svg viewBox="0 0 130 60" aria-hidden="true" focusable="false"><g stroke="#0000A4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none">
+      <path d="M4 22h14M2 32h12M6 42h10" stroke="#0000FF"/>
+      <rect x="26" y="14" width="56" height="32" rx="4" fill="#fff"/>
+      <path d="M82 24h20q8 0 11 8l5 8v6H82Z" fill="#D2E1FF"/>
+      <rect x="88" y="28" width="14" height="10" rx="2" fill="#fff"/>
+      <circle cx="42" cy="48" r="7" fill="#fff"/><circle cx="42" cy="48" r="2.5" fill="#D2E1FF"/>
+      <circle cx="100" cy="48" r="7" fill="#fff"/><circle cx="100" cy="48" r="2.5" fill="#D2E1FF"/>
+      <path d="M20 56h108"/>
+    </g></svg>
+  </template>
+
+  <!-- wegwijzer -->
+  <template id="art-sign">
+    <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><g stroke="#0000A4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none">
+      <path d="M28 20v92"/>
+      <path d="M22 28h62l14 12-14 12H22Z" fill="#D2E1FF"/>
+      <path d="M22 62h48l14 12-14 12H22Z" fill="#fff"/>
+      <path d="M8 112h104"/>
+      <circle cx="28" cy="18" r="4" fill="#0000A4"/>
+    </g></svg>
+  </template>
+
+  <!-- loket -->
+  <template id="art-loket">
+    <svg viewBox="0 0 240 200" aria-hidden="true" focusable="false"><g stroke="#0000A4" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none">
+      <path d="M8 180h224"/>
+      <rect x="40" y="28" width="160" height="152" rx="24" fill="#fff"/>
+      <rect x="62" y="50" width="116" height="78" rx="12" fill="#EDF3FF"/>
+      <rect x="88" y="64" width="64" height="48" rx="6" fill="#fff"/>
+      <path d="M98 78h44M98 88h30M98 98h38" stroke="#D2E1FF" stroke-width="4"/>
+      <rect x="50" y="128" width="140" height="12" rx="6" fill="#D2E1FF"/>
+      <path d="M150 128a9 9 0 0 1 18 0Z" fill="#fff"/><circle cx="159" cy="117" r="2.5" fill="#0000A4"/>
+      <rect x="90" y="4" width="60" height="16" rx="4" fill="#0000A4"/>
+      <path d="M120 20v8"/>
+    </g></svg>
+  </template>
+
+  <script>
+  (function () {
+    'use strict';
+    var root = document.getElementById('app');
+    var BASE = '../';
+
+    var IC = {
+      chevR: '<svg class="ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M9.793 16.707a1 1 0 0 1 0-1.414L13.086 12 9.793 8.707a1 1 0 0 1 1.414-1.414l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0" clip-rule="evenodd"/></svg>',
+      chevD: '<svg class="ic chev-d" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M5.293 8.793a1 1 0 0 1 1.414 0L12 14.086l5.293-5.293a1 1 0 1 1 1.414 1.414l-6 6a1 1 0 0 1-1.414 0l-6-6a1 1 0 0 1 0-1.414" clip-rule="evenodd"/></svg>',
+      arrowR: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M13 5l7 7-7 7"/></svg>',
+      ext: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+      check: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#D2E1FF"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>',
+      truck: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>',
+      chart: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16M7 16v-5M12 16V7M17 16v-8"/></svg>',
+      target: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>',
+      scale: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10V4h6M20 14v6h-6M4 4l6 6M20 20l-6-6"/></svg>',
+      globe: '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>'
+    };
+
+    var links = {};
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function tpl(id) {
+      var t = document.getElementById(id);
+      return t ? t.innerHTML : '';
+    }
+    function sentences(t) {
+      var m = String(t || '').match(/[^.!?]+[.!?]+/g);
+      return (m || [String(t || '')]).map(function (s) { return s.trim(); }).filter(Boolean);
+    }
+    function url(u) {
+      if (typeof u === 'string' && u.indexOf('@links.') === 0) return links[u.slice(7)] || '#';
+      return u || '#';
+    }
+    function cta(c, cls) {
+      if (!c) return '';
+      var ext = !!c.extern;
+      return '<a class="btn ' + cls + '" href="' + esc(url(c.url)) + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + '>' +
+        esc(c.label) + (ext ? IC.ext + '<span class="sr">(opent in een nieuw venster)</span>' : IC.chevR) + '</a>';
+    }
+    function head(b, introHtml) {
+      return '<div class="head"><h2>' + esc(b.titel) + '</h2>' + (introHtml || '') + '</div>';
+    }
+
+    var R = {};
+
+    /* 1. hero: titel, een zin, een knop, het magazijn */
+    R.hero = function (b) {
+      var s = sentences(b.intro);
+      var zin = s[s.length - 1] || '';
+      return '<section class="hero"><div class="wrap rv">' +
+        '<div class="hero-text"><h1>' + esc(b.titel) + '</h1><p class="lead">' + esc(zin) + '</p>' + cta(b.cta, 'btn-primary') + '</div>' +
+        '<div class="hero-art">' + tpl('art-hero') + '</div>' +
+        '</div></section>';
+    };
+
+    /* 2. de ingang: zes bordjes aan een balk */
+    R.groeiambities = function (b) {
+      return '<section class="ingang"><div class="wrap rv">' +
+        head(b, '<p class="lead">' + esc(b.intro) + '</p>') +
+        '<div class="gate"><ul class="signs">' +
+        (b.items || []).map(function (t) { return '<li class="sign">' + esc(t) + '</li>'; }).join('') +
+        '</ul></div>' +
+        (b.slot ? '<p class="after muted">' + esc(b.slot) + '</p>' : '') +
+        '</div></section>';
+    };
+
+    /* 3. de zones: stap 1, 2, 3 met vignet */
+    R['wat-doet'] = function (b) {
+      return '<section class="zones-sec"><div class="wrap rv">' +
+        head(b, '<p class="lead">' + esc(b.intro) + '</p>') +
+        '<ol class="zones">' +
+        (b.stappen || []).map(function (s, i) {
+          return '<li class="zone">' + tpl('art-zone-' + (i + 1)) +
+            '<span class="num" aria-hidden="true">' + esc(s.nummer) + '</span>' +
+            '<h3><span class="sr">Stap ' + esc(s.nummer) + ': </span>' + esc(s.titel) + '</h3></li>';
+        }).join('') +
+        '</ol>' +
+        (b.slot ? '<p class="after muted">' + esc(b.slot) + '</p>' : '') +
+        '</div></section>';
+    };
+
+    /* 4. de plank: vijf dozen met een etiket */
+    R.voordelen = function (b) {
+      var items = (b.items || []).map(function (it) {
+        var titel = esc(it.titel);
+        if (it.cijfer != null) {
+          var mark = esc(String(it.cijfer) + (it.eenheid || '') + '*');
+          titel = titel.replace(mark, '<span class="big">' + mark + '</span>');
+        }
+        return '<li class="crate"><div class="lid" aria-hidden="true"></div><div class="label">' +
+          (IC[it.icoon] || '') + '<h3>' + titel + '</h3><p>' + esc(it.tekst) + '</p></div></li>';
+      }).join('');
+      var foot = b.voetnoot ? '<div class="foot"><button type="button" class="link" data-toggle aria-expanded="false" aria-controls="voetnoot">Over het sterretje' + IC.chevD + '</button>' +
+        '<p id="voetnoot" class="muted small" hidden>' + esc(b.voetnoot) + '</p></div>' : '';
+      return '<section class="plank"><div class="wrap rv">' + head(b) + '<ul class="shelf">' + items + '</ul>' + foot + '</div></section>';
+    };
+
+    /* 5. het laadperron: vroeger en nu */
+    R.medisana = function (b) {
+      var voor = b.voor || {}, na = b.na || {};
+      return '<section class="perron"><div class="wrap rv">' + head(b) +
+        '<div class="dock">' +
+          '<div class="bay then">' + tpl('art-lorry') + '<p class="lbl">' + esc(voor.label) + '</p><p class="val">' + esc(voor.waarde) + '</p><p class="muted">vanuit ' + esc(voor.vanuit) + '</p></div>' +
+          '<div class="dock-arrow" aria-hidden="true">' + IC.arrowR + '</div>' +
+          '<div class="bay now">' + tpl('art-van') + '<p class="lbl">' + esc(na.label) + '</p><p class="val">' + esc(na.waarde) + '</p><p class="muted">in ' + esc(na['in']) + '</p></div>' +
+        '</div>' +
+        '<div class="story">' +
+          (b.quote ? '<figure><blockquote>' + esc(b.quote) + '</blockquote><figcaption>' + esc(b.quoteBron) + '</figcaption></figure>' : '') +
+          '<div class="story-more"><button type="button" class="link" data-toggle aria-expanded="false" aria-controls="medisana-tekst">Wat er veranderde' + IC.chevD + '</button>' +
+          '<p id="medisana-tekst" class="after" hidden>' + esc(b.tekst) + '</p></div>' +
+          '<div class="actions">' + cta(b.cta, 'btn-secondary') + '</div>' +
+        '</div>' +
+        '</div></section>';
+    };
+
+    /* 6. wegwijzer naar het loket */
+    R.ecosysteem = function (b) {
+      var s = sentences(b.tekst);
+      var intro = s.slice(0, 2).join(' ');
+      var laatste = s.slice(2).join(' ');
+      return '<section class="eco tight"><div class="wrap rv">' +
+        '<div><h2>' + esc(b.titel) + '</h2><p class="lead">' + esc(intro) + '</p>' +
+        (laatste ? '<a class="wegwijzer" href="#partner-selector"><span>' + esc(laatste) + '</span></a>' : '') + '</div>' +
+        tpl('art-sign') +
+        '</div></section>';
+    };
+
+    /* anker */
+    R['partner-selector'] = function (b) {
+      return '<div id="' + esc(b.id) + '" class="anchor"></div>';
+    };
+
+    /* 7. het loket */
+    R.selector = function (b) {
+      return '<section class="loket-band"><div class="wrap rv"><div class="loket">' +
+        tpl('art-loket') +
+        '<div><h2>' + esc(b.titel) + '</h2><p class="lead">' + esc(b.tekst) + '</p>' +
+        '<ul class="checks">' + (b.items || []).map(function (t) { return '<li>' + IC.check + '<span>' + esc(t) + '</span></li>'; }).join('') + '</ul>' +
+        '<div class="actions">' + cta(b.cta, 'btn-primary') + '</div></div>' +
+        '</div></div></section>';
+    };
+
+    /* 8. de stations: vier partners op een rail */
+    R.partners = function (b) {
+      return '<section class="stations-sec"><div class="wrap rv">' +
+        head(b, b.subtitel ? '<p class="lead">' + esc(b.subtitel) + '</p>' : '') +
+        '<div class="rail"><ul class="stations">' +
+        (b.items || []).map(function (p) {
+          return '<li class="station">' +
+            '<div class="logo"><img src="' + esc(BASE + p.logo) + '" alt="' + esc(p.naam) + '" loading="lazy"></div>' +
+            '<h3>' + esc(p.naam) + '</h3><p>' + esc(p.tekst) + '</p>' +
+            '<a class="link" href="' + esc(url(p.url)) + '">Meer over ' + esc(p.naam) + IC.chevR + '</a></li>';
+        }).join('') +
+        '</ul></div></div></section>';
+    };
+
+    /* 9. het prikbord */
+    R.faq = function (b) {
+      return '<section class="prikbord"><div class="wrap rv">' +
+        head(b, b.subtitel ? '<p class="lead">' + esc(b.subtitel) + '</p>' : '') +
+        '<ul class="board">' +
+        (b.items || []).map(function (q, i) {
+          var id = 'faq-a-' + i;
+          return '<li class="note"><h3><button type="button" class="q" data-toggle aria-expanded="false" aria-controls="' + id + '">' +
+            '<span>' + esc(q.vraag) + '</span>' + IC.chevD + '</button></h3>' +
+            '<div id="' + id + '" class="a" hidden><p>' + esc(q.antwoord) + '</p></div></li>';
+        }).join('') +
+        '</ul></div></section>';
+    };
+
+    /* terugval op bloktype voor onbekende id's */
+    R.banner_with_image = function (b) { return b.beeld ? R.hero(b) : R.selector(b); };
+    R.usp_list = R.groeiambities;
+    R.step_by_step_card = R['wat-doet'];
+    R.usp_cards = R.voordelen;
+    R.text_snippet = function (b) { return b.voor ? R.medisana(b) : R.ecosysteem(b); };
+    R.anchor_point = R['partner-selector'];
+    R.card_carousel = R.partners;
+
+    function wire() {
+      var btns = root.querySelectorAll('[data-toggle]');
+      Array.prototype.forEach.call(btns, function (btn) {
+        var tgt = document.getElementById(btn.getAttribute('aria-controls'));
+        btn.addEventListener('click', function () {
+          var open = btn.getAttribute('aria-expanded') === 'true';
+          btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+          if (tgt) tgt.hidden = open;
+          btn.classList.toggle('open', !open);
+        });
+      });
+    }
+
+    function reveal() {
+      var els = root.querySelectorAll('.rv');
+      var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (still || !('IntersectionObserver' in window)) {
+        Array.prototype.forEach.call(els, function (el) { el.classList.add('in'); });
+        return;
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+      Array.prototype.forEach.call(els, function (el) { io.observe(el); });
+    }
+
+    fetch(BASE + 'content.json')
+      .then(function (r) { if (!r.ok) throw new Error('content.json ' + r.status); return r.json(); })
+      .then(function (c) {
+        links = c.links || {};
+        var html = (c.blokken || []).map(function (b) {
+          var f = R[b.id] || R[b.type];
+          return f ? f(b) : '';
+        }).join('');
+        root.innerHTML = html;
+        wire();
+        reveal();
+      })
+      .catch(function (err) {
+        root.innerHTML = '<section><div class="wrap"><h1>Ontdek Fulfilment Partners via bol</h1><p class="lead">De inhoud kon niet geladen worden. Probeer het later opnieuw.</p></div></section>';
+        if (window.console) console.error(err);
+      });
+  })();
+  </script>
+</main>
+</body>
+</html>

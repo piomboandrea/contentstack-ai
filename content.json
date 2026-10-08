@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "bron": "https://partnerplatform.bol.com/nl/cdp/third-party-logistics",
+    "titel": "Ontdek Fulfilment Partners via bol | Partnerplatform",
+    "taal": "nl-NL",
+    "cms": "Contentstack (modular blocks, zie blokken[].type)",
+    "opgehaald": "2026-10-08"
+  },
+  "breadcrumb": [
+    { "label": "Beleid", "url": "https://partnerplatform.bol.com/nl/l1op/beleid" },
+    { "label": "Verzend- & Retourbeleid", "url": "https://partnerplatform.bol.com/nl/l2op/verzend-en-retour-beleid" },
+    { "label": "Bestelling behandelen en verzenden via eigen verzending", "url": "https://partnerplatform.bol.com/nl/idp/bestelling-behandelen-en-verzenden-via-eigen-verzendwijze" },
+    { "label": "Ontdek Fulfilment Partners via bol", "url": null }
+  ],
+  "links": {
+    "partnerSelector": "https://verkoper.bol.com/optiext/optiextension.dll?ID=PbkPm%2BWXcgMwIIqs6c7K2gw4fXTh2zXyv4kq80p47TFtO0IzGT3KxGbp0heH%2BHUTGMfo8OTnEGqnQ67cwzH1y0Rtz5ezf&CAMPAIGN_CODE=OTLHBZTN",
+    "medisana": "https://partnerplatform.bol.com/nl/ledp/interview-medisana",
+    "startVerkopen": "https://partnerplatform.bol.com/nl/cdp/verkopen-via-bol",
+    "inloggen": "https://partnerplatform.bol.com/nl/cdp/inloggen-verkoopaccount"
+  },
+  "blokken": [
+    {
+      "type": "banner_with_image",
+      "id": "hero",
+      "titel": "Ontdek Fulfilment Partners via bol",
+      "intro": "Een sterke leverbelofte sluit goed aan op wat klanten verwachten en kan bijdragen aan meer zichtbaarheid, een hogere conversie en verdere groei. Ontdek hoe een fulfilmentpartner binnen het bol-ecosysteem je ondersteunt bij betrouwbare logistiek en verdere groei.",
+      "cta": { "label": "Vind jouw fulfilmentpartner", "url": "@links.partnerSelector", "extern": true },
+      "beeld": { "src": "img/hero-doos-gloeilamp.webp", "alt": "Een doos met een gloeilamp erboven, voor een groene achtergrond", "breedte": 1600, "hoogte": 573 }
+    },
+    {
+      "type": "usp_list",
+      "id": "groeiambities",
+      "titel": "Ruimte voor jouw groeiambities",
+      "intro": "Veel ondernemers merken dat logistieke processen meer tijd vragen naarmate hun business groeit. Herken je een van deze situaties?",
+      "items": [
+        "Je leverperformance kan beter.",
+        "Je wilt een snellere levertijd bieden aan je klanten.",
+        "Het verwerken van bestellingen neemt een groot deel van je werkdag in beslag.",
+        "Je wilt groeien zonder dat logistiek een rem wordt op je ambities.",
+        "Je wilt meer tijd besteden aan je bedrijf en minder aan operationele en logistieke processen.",
+        "Je wilt uitbreiden naar andere markten of platformen."
+      ],
+      "slot": "Wanneer je deze signalen herkent, kan het waardevol zijn om te onderzoeken of een fulfilmentpartner bij jouw bedrijf past."
+    },
+    {
+      "type": "step_by_step_card",
+      "id": "wat-doet",
+      "titel": "Wat doet een fulfilment partner precies?",
+      "intro": "Een fulfilment partner neemt logistieke werkzaamheden uit handen. Afhankelijk van je wensen ondersteunen zij bij:",
+      "stappen": [
+        { "nummer": 1, "titel": "Opslag van je artikelen" },
+        { "nummer": 2, "titel": "Verwerking en verzending van bestellingen via bol en andere verkoopkanalen" },
+        { "nummer": 3, "titel": "Afhandeling van retouren" }
+      ],
+      "slot": "Hierdoor creëer je rust in je operatie en houd je focus op wat echt telt: het laten groeien van je business."
+    },
+    {
+      "type": "usp_cards",
+      "id": "voordelen",
+      "titel": "De voordelen voor jouw bedrijf",
+      "items": [
+        { "titel": "Een sterkere leverbelofte", "tekst": "Blijf competitief dankzij jouw leverbelofte.", "icoon": "truck" },
+        { "titel": "Tot 60%* meer verkopen", "tekst": "Grotere kans op het koopblok, hogere conversie en meer omzet, dankzij jouw sterke leverbelofte.", "icoon": "chart", "cijfer": 60, "eenheid": "%" },
+        { "titel": "Focus op commercie", "tekst": "Door logistieke werkzaamheden uit te besteden, ontstaat meer ruimte voor je assortiment, marketing en klantcontact.", "icoon": "target" },
+        { "titel": "Schaalbaar ondernemen", "tekst": "Bij meer bestellingen neemt de logistieke complexiteit toe. Een fulfilmentpartner beweegt mee, ook tijdens pieken.", "icoon": "scale" },
+        { "titel": "Internationale groei", "tekst": "Een fulfilment partner kan ondersteuning bieden bij internationale fulfilment en verzending.", "icoon": "globe" }
+      ],
+      "voetnoot": "*Dit percentage is gebaseerd op gemiddeldes, die per partner en per product kunnen verschillen. Naast de leverbelofte, kunnen er ook andere factoren een rol spelen in dit percentage, zoals: prijs, reviews, het behandelen van klantvragen, etc."
+    },
+    {
+      "type": "text_snippet",
+      "id": "medisana",
+      "titel": "Hoe verkooppartner Medisana groeide met een fulfilmentpartner",
+      "tekst": "Medisana leverde bestellingen vanuit Duitsland, met een levertijd van 3 tot 5 dagen. Door samen te werken met een fulfilmentpartner binnen het bol-ecosysteem konden zij levering de volgende dag aanbieden in Nederland en België. Volgens Medisana droegen de kortere levertijd en schaalbare logistieke inrichting direct bij aan verdere groei.",
+      "quote": "Klanten verwachten snelle levering. De kortere levertijd heeft een belangrijke bijdrage geleverd aan onze groei.",
+      "quoteBron": "Medisana",
+      "voor": { "label": "Levertijd vroeger", "waarde": "3 tot 5 dagen", "vanuit": "Duitsland" },
+      "na": { "label": "Levertijd nu", "waarde": "Volgende dag", "in": "Nederland en België" },
+      "cta": { "label": "Lees het succesverhaal", "url": "@links.medisana", "extern": false },
+      "beeld": { "src": "img/wereldbol-warehouse.webp", "alt": "Een wereldbol in een warehouse." }
+    },
+    {
+      "type": "text_snippet",
+      "id": "ecosysteem",
+      "titel": "Vind de juiste ondersteuning binnen het bol-ecosysteem",
+      "tekst": "Binnen het bol-ecosysteem vind je verschillende gecertificeerde fulfilment partners. Omdat elk bedrijf uniek is qua assortiment en volume, is er geen standaardoplossing. We helpen je daarom graag om inzicht te krijgen in welke partij het beste aansluit bij jouw specifieke situatie."
+    },
+    {
+      "type": "anchor_point",
+      "id": "partner-selector"
+    },
+    {
+      "type": "banner_with_image",
+      "id": "selector",
+      "titel": "Vind jouw fulfilment partner",
+      "tekst": "Met de Partner Selector ontdek je binnen enkele minuten welke logistieke ondersteuning bij je past. Je beantwoordt een aantal korte vragen over je artikelen en wensen, waarna je direct een overzicht ontvangt van passende fulfilmentpartners.",
+      "items": [
+        "Het gebruik van de selector is gratis en volledig vrijblijvend.",
+        "Je krijgt snel inzicht zonder ergens aan vast te zitten.",
+        "Je bepaalt zelf of en wanneer je contact opneemt met een partner."
+      ],
+      "cta": { "label": "Vind jouw fulfilment partner", "url": "@links.partnerSelector", "extern": true },
+      "vragenVoorbeeld": [
+        { "vraag": "Hoeveel bestellingen verwerk je per maand?", "opties": ["Minder dan 100", "100 tot 500", "500 tot 2.000", "Meer dan 2.000"] },
+        { "vraag": "Wat verkoop je vooral?", "opties": ["Kleine artikelen", "Mode en lifestyle", "Grote of zware artikelen", "Gemengd assortiment"] },
+        { "vraag": "Waar wil je leveren?", "opties": ["Nederland", "België", "Nederland en België", "Ook buiten de Benelux"] },
+        { "vraag": "Wat is voor jou het belangrijkst?", "opties": ["Snelle levering", "Lage kosten", "Retourafhandeling", "Inzicht en dashboards"] }
+      ]
+    },
+    {
+      "type": "card_carousel",
+      "id": "partners",
+      "titel": "Interesse?",
+      "subtitel": "We werken samen met 4 partijen.",
+      "items": [
+        { "naam": "QLS", "tekst": "QLS is een fulfilmentpartner die bol-verkopers helpt hun logistiek te professionaliseren en verder te groeien op het platform.", "logo": "img/logo-qls.png", "url": "https://partnerplatform.bol.com/nl/cpdp/qls", "profiel": { "volume": ["Minder dan 100", "100 tot 500", "500 tot 2.000"], "assortiment": ["Kleine artikelen", "Gemengd assortiment"], "regio": ["Nederland", "België", "Nederland en België"], "sterkte": ["Snelle levering", "Lage kosten"] } },
+        { "naam": "Monta", "tekst": "Monta biedt ondersteuning in opslag, orderverwerking, verzending en retourafhandeling. Daarnaast biedt het online dashboard vele inzichten en adviezen.", "logo": "img/logo-monta.png", "url": "https://partnerplatform.bol.com/nl/cpdp/monta", "profiel": { "volume": ["100 tot 500", "500 tot 2.000", "Meer dan 2.000"], "assortiment": ["Kleine artikelen", "Gemengd assortiment", "Grote of zware artikelen"], "regio": ["Nederland", "België", "Nederland en België", "Ook buiten de Benelux"], "sterkte": ["Inzicht en dashboards", "Retourafhandeling", "Snelle levering"] } },
+        { "naam": "Bleckmann", "tekst": "Bleckmann is marktleider op het gebied van supply chain management (SCM)-diensten voor mode- en lifestylemerken.", "logo": "img/logo-bleckmann.png", "url": "https://partnerplatform.bol.com/nl/cpdp/bleckmann", "profiel": { "volume": ["500 tot 2.000", "Meer dan 2.000"], "assortiment": ["Mode en lifestyle"], "regio": ["Nederland en België", "Ook buiten de Benelux"], "sterkte": ["Retourafhandeling", "Snelle levering"] } },
+        { "naam": "CEVA Logistics", "tekst": "Als internationale wereldspeler ondersteunt CEVA Logistics e-commerce en omnichannel logistiek met schaalbare fulfilment en complete end-to-end oplossingen.", "logo": "img/logo-ceva.png", "url": "https://partnerplatform.bol.com/nl/cpdp/ceva-logistics", "profiel": { "volume": ["Meer dan 2.000"], "assortiment": ["Gemengd assortiment", "Grote of zware artikelen", "Mode en lifestyle"], "regio": ["Nederland en België", "Ook buiten de Benelux"], "sterkte": ["Snelle levering", "Inzicht en dashboards"] } }
+      ]
+    },
+    {
+      "type": "faq",
+      "id": "faq",
+      "titel": "Veelgestelde vragen",
+      "subtitel": "over Third Party fulfilmentpartners",
+      "items": [
+        { "vraag": "Is een fulfilment partner alleen interessant voor grote bedrijven?", "antwoord": "Zeker niet. Of logistieke ondersteuning interessant is, hangt af van je ambities en assortiment, niet alleen van je omvang. Ook kleinere bedrijven groeien sneller door operatie uit te besteden." },
+        { "vraag": "Verlies ik de controle over mijn logistiek?", "antwoord": "Nee, je blijft zelf aan het roer. Een fulfilment partner voert de processen uit volgens jouw wensen, zodat jij je handen vrij hebt voor strategische keuzes." },
+        { "vraag": "Kan ik fulfilment gebruiken voor internationale verkoop?", "antwoord": "Ja, veel fulfilment partners zijn gespecialiseerd in grensoverschrijdende logistiek en helpen je om eenvoudig klanten in zowel Nederland als België te bedienen." }
+      ]
+    }
+  ],
+  "extraBeelden": [
+    { "src": "img/dozen.webp", "alt": "Dozen in een magazijn" },
+    { "src": "img/voorraadbeheer.webp", "alt": "Voorraadbeheer in een warehouse" },
+    { "src": "img/pickup.webp", "alt": "Pakket wordt opgehaald" },
+    { "src": "img/lvb-intro.webp", "alt": "Logistiek via bol, introductie" },
+    { "src": "img/bfc.webp", "alt": "Fulfilment center" }
+  ]
+}

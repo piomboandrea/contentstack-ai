@@ -1,0 +1,439 @@
+<!doctype html>
+<!--
+  Skill: ui-skills (improve-ui als audit, baseline-ui als opruimpas). Spectrum: "Huidig, maar beter". Concept: "Huidig, opgeruimd".
+  Dezelfde blokken in dezelfde volgorde als de echte pagina, maar op een 12-koloms raster van 1200 px met een ritme van 8 px,
+  de bol-schaal (Produkt 900 op 40/48 px, Produkt 700 op 24/28 px, Graphik 16/24, 14/20 en 12/16), 64 px tussen blokken op desktop
+  en 40 px op gsm, knoppen van 48 px, cards met radius 16 en 24 en de voetnoot op 12 px in de card zelf.
+  Keuzes: de hero toont enkel de eerste zin van de intro, het ecosysteemblok maximaal twee zinnen, de vier partners staan op één rij
+  (scroll-snap op gsm) in plaats van een carrousel van drie, de Partner Selector is een blauwe scène met beeld, en de lange
+  Medisana-tekst zit achter een knop met aria-expanded. Audit en bevindingen staan in ui-skills-PLAN.md.
+  Overwogen alternatieven: de volledige intro op 18 px, het ecosysteemblok als intro binnen de selector-card, een carrousel met
+  knoppen zoals het origineel, en een hero als afgeronde card in plaats van een volle band.
+-->
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bol fulfilmentpartners: ui-skills</title>
+<style>
+  .bolx-content, .bolx-content *, .bolx-content *::before, .bolx-content *::after { box-sizing: border-box; }
+  .bolx-content { --gut: 24px; --blok: 40px; --kol8: 1 / -1; font: 400 16px/24px var(--bol-font-body); color: var(--bol-ink); overflow-x: clip; }
+  @media (min-width: 1024px) { .bolx-content { --blok: 64px; --kol8: 3 / span 8; } }
+
+  /* raster */
+  .wrap { max-width: calc(var(--bol-container) + 32px); margin: 0 auto; padding: 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gut); }
+  .col-8 { grid-column: var(--kol8); }
+  .col-12 { grid-column: 1 / -1; }
+
+  /* ritme tussen blokken */
+  .bolx-content > section { margin-top: var(--blok); }
+  .bolx-content > section:first-child { margin-top: 24px; }
+  .bolx-content > section:last-child { margin-bottom: var(--blok); }
+  .bolx-content > .anker + section { margin-top: 32px; }
+  .bolx-content [id] { scroll-margin-top: calc(var(--bol-header-h) + 16px); }
+  .anker { display: block; height: 0; }
+
+  /* typografie */
+  .bolx-content h1 { margin: 0; font: 900 40px/48px var(--bol-font-display); color: var(--bol-blue); text-wrap: balance; }
+  .bolx-content h2 { margin: 0 0 16px; font: 700 24px/32px var(--bol-font-display); color: var(--bol-blue); text-wrap: balance; }
+  .bolx-content h3 { margin: 0; font: 600 18px/24px var(--bol-font-body); color: var(--bol-ink); text-wrap: balance; }
+  .bolx-content p { margin: 0; text-wrap: pretty; }
+  .lead { font-size: 16px; line-height: 24px; }
+  .intro { margin-bottom: 24px; }
+  .small { font-size: 14px; line-height: 20px; }
+  .tiny { font-size: 12px; line-height: 16px; }
+  .muted { color: var(--bol-ink-medium); }
+  @media (min-width: 1024px) {
+    .bolx-content h1 { font-size: 48px; line-height: 56px; }
+    .bolx-content h2 { font-size: 28px; line-height: 36px; }
+    .lead { font-size: 18px; line-height: 28px; }
+    .intro { margin-bottom: 32px; }
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  /* focus en links */
+  .bolx-content :focus-visible { outline: 2px solid var(--bol-blue-action); outline-offset: 2px; }
+  .bolx-content a { color: var(--bol-blue-action); }
+  .ico { display: inline-flex; flex: none; width: 24px; height: 24px; }
+  .ico svg { display: block; width: 24px; height: 24px; }
+
+  /* knoppen */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 16px; border-radius: var(--bol-radius-2);
+    border: 1px solid var(--bol-blue-action); font: 600 14px/20px var(--bol-font-body); text-decoration: none; white-space: nowrap; cursor: pointer;
+    transition: background-color .15s ease-out, border-color .15s ease-out, box-shadow .15s ease-out; }
+  .btn-primair { background: var(--bol-blue-action); color: #fff; }
+  .btn-primair:hover { background: var(--bol-blue-hover); border-color: var(--bol-blue-hover); box-shadow: var(--bol-shadow-2), inset 0 0 0 1px var(--bol-blue-hover); }
+  .btn-licht { background: #fff; color: var(--bol-blue-action); border-color: #fff; }
+  .btn-licht:hover { background: var(--bol-blue-minimal); box-shadow: var(--bol-shadow-2); }
+  .btn-tekst { height: 48px; padding: 0 8px; border: 0; background: none; color: var(--bol-blue-action); font: 600 14px/20px var(--bol-font-body); display: inline-flex; align-items: center; gap: 4px; cursor: pointer; border-radius: var(--bol-radius-1); }
+  .btn-tekst:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .btn-tekst .ico { transition: transform .2s ease-out; }
+  .btn-tekst[aria-expanded="true"] .ico { transform: rotate(180deg); }
+  .acties { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 32px; }
+
+  /* hero */
+  .hero { background: var(--bol-blue-minimal); }
+  .hero .wrap { padding-top: 40px; padding-bottom: 40px; }
+  .hero .grid { row-gap: 32px; align-items: center; }
+  .hero-tekst { grid-column: 1 / -1; }
+  .hero-tekst .lead { margin-top: 16px; max-width: 36em; }
+  .hero-beeld { grid-column: 1 / -1; border-radius: var(--bol-radius-4); overflow: hidden; aspect-ratio: 16 / 9; }
+  .hero-beeld img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @media (min-width: 1024px) {
+    .hero .wrap { padding-top: 64px; padding-bottom: 64px; }
+    .hero-tekst { grid-column: 1 / span 7; }
+    .hero-tekst .lead { margin-top: 24px; }
+    .hero-beeld { grid-column: 8 / span 5; border-radius: var(--bol-radius-6); aspect-ratio: 3 / 2; }
+  }
+
+  /* lijsten */
+  .lijst { margin: 0; padding-left: 24px; display: grid; gap: 8px; }
+  .lijst li::marker { color: var(--bol-blue); }
+  .slot { margin-top: 24px; }
+
+  /* stappen */
+  .stappen { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  .stap { background: var(--bol-grey); border-radius: var(--bol-radius-4); padding: 24px; display: grid; gap: 16px; align-content: start; }
+  .stap-nr { width: 32px; height: 32px; border-radius: 50%; background: var(--bol-blue); color: #fff; display: grid; place-items: center; font: 700 16px/1 var(--bol-font-display); font-variant-numeric: tabular-nums; }
+  @media (min-width: 768px) { .stappen { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; } }
+
+  /* voordelen */
+  .kaart-groot { background: var(--bol-grey); border-radius: var(--bol-radius-6); padding: 40px 24px; }
+  .usps { list-style: none; margin: 0; padding: 0; display: grid; gap: 32px; }
+  .usp { display: flex; gap: 16px; align-items: flex-start; }
+  .usp .ico { color: var(--bol-blue-action); }
+  .usp h3 { margin-bottom: 8px; }
+  .voetnoot { margin-top: 32px; max-width: 72ch; }
+  @media (min-width: 768px) {
+    .usps { grid-template-columns: repeat(6, minmax(0, 1fr)); column-gap: 24px; row-gap: 40px; }
+    .usp { grid-column: span 2; }
+    .usp:nth-child(4) { grid-column: 2 / span 2; }
+    .usp:nth-child(5) { grid-column: 4 / span 2; }
+  }
+  @media (min-width: 1024px) { .kaart-groot { padding: 64px 104px; } .voetnoot { margin-top: 48px; } }
+
+  /* case Medisana */
+  .case { background: var(--bol-blue-minimal); border-radius: var(--bol-radius-6); padding: 24px; display: grid; gap: 24px; }
+  .case-beeld { position: relative; min-height: 220px; border-radius: var(--bol-radius-4); overflow: hidden; }
+  .case-beeld img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .quote { margin: 0 0 24px; padding-left: 16px; border-left: 4px solid var(--bol-blue-low); quotes: "\201C" "\201D"; }
+  .quote p { font: 600 18px/28px var(--bol-font-body); color: var(--bol-blue); }
+  .quote p::before { content: open-quote; }
+  .quote p::after { content: close-quote; }
+  .quote footer { margin-top: 8px; }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .stat { background: #fff; border-radius: var(--bol-radius-4); padding: 16px; display: grid; gap: 4px; align-content: start; }
+  .stat-waarde { font: 300 24px/32px var(--bol-font-display); color: var(--bol-blue); font-variant-numeric: tabular-nums; }
+  .case .acties { margin-top: 24px; }
+  .meer { margin-top: 16px; max-width: 60ch; }
+  @media (min-width: 1024px) {
+    .case { grid-template-columns: 7fr 5fr; padding: 40px; gap: 40px; }
+    .stat-waarde { font-size: 28px; }
+  }
+
+  /* selector scene */
+  .scene-kaart { background: var(--bol-blue); color: #fff; border-radius: var(--bol-radius-6); padding: 24px; display: grid; gap: 24px; }
+  .scene-kaart h2, .scene-kaart p { color: #fff; }
+  .scene-kaart :focus-visible { outline-color: #fff; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .checks li { display: flex; gap: 12px; align-items: flex-start; }
+  .scene-beeld { border-radius: var(--bol-radius-4); overflow: hidden; aspect-ratio: 3 / 2; }
+  .scene-beeld img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @media (min-width: 1024px) {
+    .scene-kaart { grid-template-columns: 7fr 5fr; padding: 64px; gap: 48px; align-items: center; }
+  }
+
+  /* partners */
+  .band { background: var(--bol-grey); padding: 40px 0; }
+  .band-kop { margin-bottom: 24px; }
+  .band-kop .lead { margin: 0; }
+  .partners { list-style: none; margin: 0 -16px; padding: 4px 16px 8px; display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+  .partners li { flex: 0 0 78%; scroll-snap-align: start; }
+  .partner { display: flex; flex-direction: column; gap: 16px; height: 100%; background: #fff; border: 2px solid transparent; border-radius: var(--bol-radius-6); padding: 24px;
+    color: inherit; text-decoration: none; box-shadow: var(--bol-shadow-1); transition: border-color .15s ease-out, box-shadow .15s ease-out; }
+  .partner:hover { border-color: var(--bol-blue-action); box-shadow: var(--bol-shadow-2); }
+  .partner .logo { aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; background: var(--bol-grey); border-radius: var(--bol-radius-4); padding: 16px; }
+  .partner .logo img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; }
+  .partner h3 { color: var(--bol-blue-action); }
+  .partner-pijl { margin-top: auto; align-self: flex-end; color: var(--bol-blue-action); }
+  @media (min-width: 1024px) {
+    .band { padding: 64px 0; }
+    .band-kop { margin-bottom: 32px; }
+    .partners { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 0; overflow: visible; }
+    .partners li { flex: none; }
+  }
+
+  /* faq */
+  .faq { display: grid; gap: 16px; margin-top: 32px; }
+  .faq-item { background: #fff; border: 1px solid var(--bol-border); border-radius: var(--bol-radius-4); transition: background-color .15s ease-out, border-color .15s ease-out, box-shadow .15s ease-out; }
+  .faq-item:hover { background: var(--bol-grey); }
+  .faq-item.open { background: var(--bol-blue-minimal); border-color: var(--bol-blue-action); box-shadow: inset 0 0 0 1px var(--bol-blue-action); }
+  .faq h3 { margin: 0; }
+  .faq-knop { display: flex; width: 100%; gap: 16px; align-items: flex-start; justify-content: space-between; padding: 24px; background: none; border: 0; border-radius: var(--bol-radius-4);
+    font: 600 16px/24px var(--bol-font-body); color: var(--bol-ink); text-align: left; cursor: pointer; }
+  .faq-knop .ico { color: var(--bol-blue-action); transition: transform .2s ease-out; }
+  .faq-knop[aria-expanded="true"] .ico { transform: rotate(180deg); }
+  .faq-paneel { padding: 0 24px 24px; }
+  .faq-paneel p { max-width: 64ch; }
+
+  /* lege staat */
+  .leeg { background: var(--bol-grey); border-radius: var(--bol-radius-4); padding: 24px; display: grid; gap: 16px; justify-items: start; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bolx-content * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<script src="../bol-shell.js"></script>
+<main class="bolx-content" id="inhoud"></main>
+<script>
+(function () {
+  'use strict';
+  var main = document.querySelector('.bolx-content');
+  var base = (window.BolShell && window.BolShell.base) || '../';
+
+  /* iconen: 24 px, inline SVG, rondingen, currentColor */
+  function lijn(d) {
+    return '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  }
+  function vlak(d) {
+    return '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="' + d + '"/></svg>';
+  }
+  var ICON = {
+    truck: lijn('<path d="M3 7a1 1 0 0 1 1-1h9v10H3z"/><path d="M13 10h3.5L19 13v3h-6"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>'),
+    chart: lijn('<path d="M4 19h16"/><path d="M4 15l5-5 4 4 7-7"/><path d="M15 7h5v5"/>'),
+    target: lijn('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'),
+    scale: lijn('<path d="M4 20l6-6"/><path d="M4 20v-5"/><path d="M4 20h5"/><path d="M20 4l-6 6"/><path d="M20 4v5"/><path d="M20 4h-5"/>'),
+    globe: lijn('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3.5 3 14.5 0 18"/><path d="M12 3c-3 3.5-3 14.5 0 18"/>'),
+    check: lijn('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+    extern: lijn('<path d="M14 5h5v5"/><path d="M19 5l-8 8"/><path d="M19 14v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h4"/>'),
+    chevDown: vlak('M5.293 8.793a1 1 0 0 1 1.414 0L12 14.086l5.293-5.293a1 1 0 1 1 1.414 1.414l-6 6a1 1 0 0 1-1.414 0l-6-6a1 1 0 0 1 0-1.414'),
+    chevRight: vlak('M9.793 16.707a1 1 0 0 1 0-1.414L13.086 12 9.793 8.707a1 1 0 0 1 1.414-1.414l4 4a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0')
+  };
+
+  /* kleine DOM-helper: strings worden tekstknopen, nooit HTML */
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        var v = attrs[k];
+        if (v === null || v === undefined || v === false) return;
+        if (k === 'class') el.className = v;
+        else if (k === 'html') el.innerHTML = v;
+        else el.setAttribute(k, v === true ? '' : v);
+      });
+    }
+    for (var i = 2; i < arguments.length; i++) voeg(el, arguments[i]);
+    return el;
+  }
+  function voeg(el, kind) {
+    if (kind === null || kind === undefined || kind === false) return;
+    if (Array.isArray(kind)) { kind.forEach(function (k) { voeg(el, k); }); return; }
+    el.appendChild(typeof kind === 'string' ? document.createTextNode(kind) : kind);
+  }
+  function icon(naam, cls) {
+    return h('span', { class: 'ico' + (cls ? ' ' + cls : ''), html: ICON[naam] || ICON.check });
+  }
+  function wrap() { return h('div', { class: 'wrap' }, Array.prototype.slice.call(arguments)); }
+  function grid() { return h('div', { class: 'grid' }, Array.prototype.slice.call(arguments)); }
+  function sectie(b, cls, inhoud) {
+    return h('section', { id: b.id, class: 'blok' + (cls ? ' ' + cls : ''), 'aria-labelledby': b.id + '-titel' }, inhoud);
+  }
+  function titel(b, tag) { return h(tag || 'h2', { id: b.id + '-titel' }, b.titel); }
+
+  function url(u, links) {
+    if (typeof u === 'string' && u.indexOf('@links.') === 0) return links[u.slice(7)] || '#';
+    return u || '#';
+  }
+  function beeldSrc(src) { return base + src; }
+
+  /* zinnen tellen: de brief vraagt korte intro's, de copy blijft uit content.json komen */
+  function zinnen(t) {
+    return (t || '').match(/[^.!?]+[.!?]+(?=\s|$)/g) || [t || ''];
+  }
+  function kort(t, n) {
+    return zinnen(t).slice(0, n).map(function (z) { return z.trim(); }).join(' ');
+  }
+
+  function knop(cta, links, stijl) {
+    var a = h('a', { class: 'btn ' + (stijl || 'btn-primair'), href: url(cta.url, links) }, cta.label);
+    if (cta.extern) {
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      voeg(a, icon('extern'));
+      voeg(a, h('span', { class: 'sr-only' }, '(opent in een nieuw venster)'));
+    }
+    return a;
+  }
+
+  /* blokken, per Contentstack-type */
+  function hero(b, ctx) {
+    var tekst = h('div', { class: 'hero-tekst' },
+      titel(b, 'h1'),
+      b.intro && h('p', { class: 'lead' }, kort(b.intro, 1)),
+      b.cta && h('div', { class: 'acties' }, knop(b.cta, ctx.links))
+    );
+    var beeld = b.beeld && h('div', { class: 'hero-beeld' },
+      h('img', { src: beeldSrc(b.beeld.src), alt: b.beeld.alt, width: b.beeld.breedte, height: b.beeld.hoogte, fetchpriority: 'high' })
+    );
+    return sectie(b, 'hero', wrap(grid(tekst, beeld)));
+  }
+
+  function scene(b, ctx) {
+    var extra = (ctx.data.extraBeelden || []).filter(function (x) { return /pickup/.test(x.src); })[0] || (ctx.data.extraBeelden || [])[0];
+    var tekst = h('div', { class: 'scene-tekst' },
+      titel(b),
+      b.tekst && h('p', { class: 'lead intro' }, b.tekst),
+      b.items && h('ul', { class: 'checks' }, b.items.map(function (t) { return h('li', null, icon('check'), h('span', null, t)); })),
+      b.cta && h('div', { class: 'acties' }, knop(b.cta, ctx.links, 'btn-licht'))
+    );
+    var beeld = extra && h('div', { class: 'scene-beeld' }, h('img', { src: beeldSrc(extra.src), alt: extra.alt, loading: 'lazy' }));
+    return sectie(b, 'scene', wrap(h('div', { class: 'scene-kaart' }, tekst, beeld)));
+  }
+
+  function uspLijst(b) {
+    return sectie(b, null, wrap(grid(h('div', { class: 'col-8' },
+      titel(b),
+      b.intro && h('p', { class: 'intro' }, b.intro),
+      h('ul', { class: 'lijst' }, b.items.map(function (t) { return h('li', null, t); })),
+      b.slot && h('p', { class: 'slot small muted' }, b.slot)
+    ))));
+  }
+
+  function stappen(b) {
+    return sectie(b, null, wrap(grid(h('div', { class: 'col-8' },
+      titel(b),
+      b.intro && h('p', { class: 'intro' }, b.intro),
+      h('ol', { class: 'stappen' }, b.stappen.map(function (s) {
+        return h('li', { class: 'stap' }, h('span', { class: 'stap-nr', 'aria-hidden': 'true' }, String(s.nummer)), h('h3', null, s.titel));
+      })),
+      b.slot && h('p', { class: 'slot small muted' }, b.slot)
+    ))));
+  }
+
+  function uspCards(b) {
+    return sectie(b, null, wrap(h('div', { class: 'kaart-groot' },
+      titel(b),
+      h('ul', { class: 'usps' }, b.items.map(function (it) {
+        return h('li', { class: 'usp' }, icon(it.icoon), h('div', null, h('h3', null, it.titel), h('p', { class: 'muted' }, it.tekst)));
+      })),
+      b.voetnoot && h('p', { class: 'voetnoot tiny muted' }, b.voetnoot)
+    )));
+  }
+
+  function stat(s, plek) {
+    return h('div', { class: 'stat' },
+      h('span', { class: 'small muted' }, s.label),
+      h('strong', { class: 'stat-waarde' }, s.waarde),
+      plek && h('span', { class: 'small muted' }, plek)
+    );
+  }
+
+  function verhaal(b, ctx) {
+    var paneelId = b.id + '-meer';
+    var bron = b.quoteBron || '';
+    var tekst = h('div', { class: 'case-tekst' },
+      titel(b),
+      b.quote && h('blockquote', { class: 'quote' }, h('p', null, b.quote), bron && h('footer', { class: 'small muted' }, bron)),
+      (b.voor || b.na) && h('div', { class: 'stats' },
+        b.voor && stat(b.voor, b.voor.vanuit ? 'vanuit ' + b.voor.vanuit : null),
+        b.na && stat(b.na, b.na.in ? 'in ' + b.na.in : null)
+      ),
+      h('div', { class: 'acties' },
+        b.cta && knop(b.cta, ctx.links),
+        b.tekst && h('button', { type: 'button', class: 'btn-tekst', 'aria-expanded': 'false', 'aria-controls': paneelId }, bron ? 'Meer over ' + bron : 'Meer lezen', icon('chevDown'))
+      ),
+      b.tekst && h('p', { id: paneelId, class: 'meer', hidden: true }, b.tekst)
+    );
+    var beeld = b.beeld && h('div', { class: 'case-beeld' }, h('img', { src: beeldSrc(b.beeld.src), alt: b.beeld.alt, loading: 'lazy' }));
+    return sectie(b, null, wrap(grid(h('div', { class: 'col-8' }, h('article', { class: 'case' }, tekst, beeld)))));
+  }
+
+  function tekstBlok(b) {
+    return sectie(b, 'tekst', wrap(grid(h('div', { class: 'col-8' },
+      titel(b),
+      b.tekst && h('p', null, kort(b.tekst, 2))
+    ))));
+  }
+
+  function partners(b) {
+    return sectie(b, 'band', wrap(
+      h('div', { class: 'band-kop' }, titel(b), b.subtitel && h('p', { class: 'lead' }, b.subtitel)),
+      h('ul', { class: 'partners' }, b.items.map(function (p) {
+        return h('li', null, h('a', { class: 'partner', href: p.url },
+          h('span', { class: 'logo' }, h('img', { src: beeldSrc(p.logo), alt: '', loading: 'lazy' })),
+          h('h3', null, p.naam),
+          h('p', { class: 'muted' }, p.tekst),
+          icon('chevRight', 'partner-pijl')
+        ));
+      }))
+    ));
+  }
+
+  function faq(b) {
+    return sectie(b, null, wrap(grid(h('div', { class: 'col-8' },
+      titel(b),
+      b.subtitel && h('p', { class: 'lead muted' }, b.subtitel),
+      h('div', { class: 'faq' }, b.items.map(function (it, i) {
+        var knopId = b.id + '-knop-' + i, paneelId = b.id + '-paneel-' + i;
+        return h('div', { class: 'faq-item' },
+          h('h3', null, h('button', { type: 'button', class: 'faq-knop', id: knopId, 'aria-expanded': 'false', 'aria-controls': paneelId }, h('span', null, it.vraag), icon('chevDown'))),
+          h('div', { id: paneelId, class: 'faq-paneel', role: 'region', 'aria-labelledby': knopId, hidden: true }, h('p', null, it.antwoord))
+        );
+      }))
+    ))));
+  }
+
+  var R = {
+    banner_with_image: function (b, ctx) { return ctx.index === 0 ? hero(b, ctx) : scene(b, ctx); },
+    usp_list: uspLijst,
+    step_by_step_card: stappen,
+    usp_cards: uspCards,
+    text_snippet: function (b, ctx) { return b.quote ? verhaal(b, ctx) : tekstBlok(b, ctx); },
+    anchor_point: function (b) { return h('div', { id: b.id, class: 'anker' }); },
+    card_carousel: partners,
+    faq: faq
+  };
+
+  function render(data) {
+    var frag = document.createDocumentFragment();
+    (data.blokken || []).forEach(function (b, i) {
+      var maak = R[b.type];
+      if (!maak) return;
+      frag.appendChild(maak(b, { index: i, links: data.links || {}, data: data }));
+    });
+    main.replaceChildren(frag);
+  }
+
+  function leeg() {
+    main.replaceChildren(h('section', { class: 'blok', 'aria-labelledby': 'leeg-titel' }, wrap(grid(h('div', { class: 'col-8' },
+      h('div', { class: 'leeg' },
+        h('h1', { id: 'leeg-titel' }, 'De inhoud kon niet geladen worden'),
+        h('p', null, 'Open deze variant via de lokale server, dan laadt content.json wel.'),
+        h('a', { class: 'btn btn-primair', href: 'https://partnerplatform.bol.com/nl/cdp/third-party-logistics' }, 'Bekijk de live pagina')
+      )
+    )))));
+  }
+
+  /* accordeons en de knop Meer over: aria-expanded stuurt hidden */
+  main.addEventListener('click', function (e) {
+    var k = e.target.closest('[aria-expanded][aria-controls]');
+    if (!k || !main.contains(k)) return;
+    var open = k.getAttribute('aria-expanded') === 'true';
+    k.setAttribute('aria-expanded', String(!open));
+    var p = document.getElementById(k.getAttribute('aria-controls'));
+    if (p) p.hidden = open;
+    var item = k.closest('.faq-item');
+    if (item) item.classList.toggle('open', !open);
+  });
+
+  fetch('../content.json')
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(render)
+    .catch(leeg);
+})();
+</script>
+</body>
+</html>
