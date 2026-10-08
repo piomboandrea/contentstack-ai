@@ -425,7 +425,7 @@
     .ed-type svg{display:none}
     .ed-canvas{padding:10px}
     .ed-fields{grid-template-columns:1fr}
-    .ed-f:nth-child(even){display:none}
+    .ed-f:nth-child(even),.ed-list.fill .ed-f:nth-child(even){display:none}
     .ed-list.fill .ed-in{flex-basis:40px;font-size:13px}
     .ed-list.fill .ed-fields{grid-template-rows:repeat(2,minmax(0,1fr))}
     .tmr{height:34px;padding:0 10px 0 8px;gap:6px}
@@ -532,6 +532,39 @@
     .btn-yel{min-height:56px;font-size:16px;padding:0 24px}
     .c8-tiles{gap:6px}
     .c8-tiles i{width:40px;height:28px}
+  }
+  /* lage schermen (laptop): de blokken van vandaag op één rij velden, zodat label en veld nooit over elkaar vallen */
+  @media (min-width:768px) and (max-height:860px){
+    .ed-list.fill{gap:12px}
+    .ed-list.fill .ed-card-h{margin-bottom:6px}
+    .ed-list.fill .ed-fields{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:minmax(0,1fr);gap:0 14px}
+    .ed-list.fill .ed-in{flex:0 0 auto;height:clamp(32px,5.4vh,46px);font-size:clamp(13px,1.9vh,16px);padding:0 12px}
+    .ed-side ul{gap:4px}
+    .ed-type{height:clamp(28px,4.6vh,40px)}
+  }
+  @media (max-width:767px) and (max-height:760px){.c6-viz{display:none}.c6-band{padding:14px 16px}}
+  /* gsm liggend: compacte balken, de inhoud scrolt tussen boven- en onderbalk */
+  @media (max-height:520px) and (orientation:landscape){
+    :root{--pad:24px;--topH:60px;--botH:64px}
+    .top{gap:20px}
+    .brand-bol{height:20px}.brand-d{height:19px}
+    .pg{min-height:36px;padding:10px 0 6px}
+    .pg-l{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+    .skip{min-height:40px;padding:0 10px 0 12px;font-size:13px}
+    .hint{display:none}
+    .bot{justify-content:space-between}
+    .btn-prev{min-height:40px}
+    .btn-next{min-height:44px;padding:0 18px 0 22px;font-size:15px}
+    .inner{top:var(--topH);bottom:var(--botH);padding-top:6px;padding-bottom:10px;overflow-y:auto;overscroll-behavior:contain}
+    .c5{column-gap:44px}
+    .copy{margin-bottom:12px}
+    .ttl{font-size:26px}
+    .sub{margin-top:4px;font-size:14px}
+    .s1 .copy,.s8 .copy{margin-bottom:18px}
+    .s8 .ttl{font-size:40px}
+    .s8 .vis{gap:18px}
+    .vis{flex:none;height:380px}
+    .s1 .vis,.s8 .vis{height:auto}
   }
   @media (prefers-reduced-motion:reduce){.caret i{animation:none}}
 </style>
@@ -1410,10 +1443,17 @@
     else if (k === 'Home') { e.preventDefault(); goTo(1); }
     else if (k === 'End') { e.preventDefault(); goTo(CH.length); }
   });
-  let rt = 0;
+  /* opnieuw opbouwen enkel als de breedte echt verandert of de hoogte sterk: op een gsm verandert de hoogte bij elke
+     scroll door de adresbalk, en dat liet het hoofdstuk telkens naar zijn eindbeeld springen */
+  let rt = 0, lastW = window.innerWidth, lastH = window.innerHeight;
   window.addEventListener('resize', function () {
     clearTimeout(rt);
-    rt = setTimeout(function () { if (cur && CH[cur - 1].layout) goTo(cur, { force: true, final: true }); }, 250);
+    rt = setTimeout(function () {
+      const w = window.innerWidth, hh = window.innerHeight;
+      if (w === lastW && Math.abs(hh - lastH) < 160) return;
+      lastW = w; lastH = hh;
+      if (cur && CH[cur - 1].layout) goTo(cur, { force: true, final: true });
+    }, 250);
   });
 
   /* ---------- start ---------- */

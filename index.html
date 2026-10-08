@@ -23,7 +23,7 @@
   a { color: var(--action); }
   svg { width: 20px; height: 20px; display: block; }
 
-  .app { display: grid; grid-template-rows: auto 1fr; height: 100vh; }
+  .app { display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); height: 100vh; height: 100dvh; }
   .topbar { background: var(--blue); color: #fff; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px; padding: 0 24px; height: 72px; position: relative; }
   .topbar::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: linear-gradient(90deg, var(--action), var(--hover) 60%, var(--blue)); opacity: .9; }
   .tb-l { display: flex; align-items: center; gap: 18px; min-width: 0; }
@@ -298,9 +298,38 @@
     .list { display: flex; overflow-x: auto; gap: 6px; padding: 8px 10px; }
     .group, .keys, .item .desc, .item .num { display: none; }
     .item { width: auto; white-space: nowrap; grid-template-columns: 8px auto; }
-    .stage { min-height: 80vh; }
+    .stage { min-height: 0; flex: none; height: calc(100svh - 112px); }
     .stage.split { grid-template-columns: 1fr; }
     .doc h1 { font-size: 32px; line-height: 34px; }
+    /* geen kolom die meegroeit met de inhoud, de galerij scrollt mee met de pagina */
+    #vOntwerpen { grid-template-columns: minmax(0, 1fr); }
+    .gallery { flex: none; overflow: visible; padding: 16px 16px 32px; }
+    .g-grid { grid-template-columns: minmax(0, 1fr); }
+    .g-open { opacity: 1; transform: none; }
+    .g-skill { display: none; }
+    .seg { display: none; }
+    .title .nm { font-size: 17px; }
+    .top { gap: 8px; min-height: 56px; }
+    .t { display: none; }
+    .tb-div { display: none; }
+    .doc .wrap { padding: 28px 16px 64px; }
+    .doc .lead { font-size: 18px; line-height: 26px; }
+    .doc h2 { font-size: 24px; line-height: 28px; margin-top: 40px; }
+    table.cmp { display: block; overflow-x: auto; }
+    .cta { margin-bottom: 8px; }
+  }
+  @media (max-width: 860px) { aside .brand { display: none; } }
+  @media (min-width: 861px) and (max-width: 1180px) {
+    #vOntwerpen { grid-template-columns: 240px minmax(0, 1fr); }
+    .item .desc { display: none; }
+    .seg, .title .chip { display: none; }
+  }
+  @media (max-width: 560px) {
+    .tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; border-radius: 16px; overflow: visible; }
+    .tabs button { flex-direction: column; justify-content: center; gap: 4px; padding: 8px 4px; border-radius: 12px; font-size: 12px; line-height: 16px; white-space: nowrap; min-height: 56px; }
+    .tabs .n { width: 24px; height: 24px; font-size: 12px; }
+    .tabs .lbl { font-size: 12px; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .tb-logo { height: 18px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -502,7 +531,9 @@
   var list = $('list'), stage = $('stage');
   var ready = { live: true }, state = { a: null, b: null, mobile: false, split: false, tab: 'Ontwerpen', view: 'grid' };
   var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HOVER = !window.matchMedia || window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   try { var s = JSON.parse(localStorage.getItem('bol-skills-state') || '{}'); state.mobile = !!s.mobile; state.split = !!s.split; state.b = s.b || null; } catch (e) {}
+  if (window.innerWidth <= 1180) { state.mobile = false; state.split = false; }
   function save() { try { localStorage.setItem('bol-skills-state', JSON.stringify({ mobile: state.mobile, split: state.split, b: state.b })); } catch (e) {} }
 
   function byId(id) { for (var i = 0; i < V.length; i++) if (V[i].id === id) return V[i]; return null; }
@@ -571,13 +602,23 @@
       '<div class="g-meta"><span class="g-num">' + (v.id === 'live' ? 'nu' : i) + '</span><span class="g-name">' + v.n + '</span><span class="g-skill">' + v.d + '</span></div></div></button>';
   }).join('');
   var cards = [].slice.call(gGrid.querySelectorAll('.g-card'));
+  function isNarrow() { return window.innerWidth <= 860; }
   function stageBox() {
     var m = $('mainView').getBoundingClientRect(), th = document.querySelector('.top').offsetHeight;
-    var narrow = window.innerWidth <= 860, ix = narrow ? 0 : 16, it = narrow ? 0 : 4, ib = narrow ? 0 : 16;
+    if (isNarrow()) {
+      /* vaste maat op basis van het scherm: de miniatuur toont het ontwerp zoals op deze gsm */
+      var w = Math.max(320, Math.round(window.innerWidth)), hh = Math.max(480, Math.round(window.innerHeight - 112));
+      return { left: m.left, top: m.top + th, width: w, height: hh, th: th };
+    }
+    var ix = 16, it = 4, ib = 16;
     return { left: m.left + ix, top: m.top + th + it, width: Math.round(m.width - ix * 2), height: Math.round(m.height - th - it - ib), th: th };
   }
+  var lastFit = '';
   function fitThumbs() {
     var b = stageBox(); if (!b.width || !b.height) return;
+    var key = b.width + 'x' + b.height + ':' + cards.map(function (c) { return c.querySelector('.g-shot').clientWidth; }).join(',');
+    if (key === lastFit) return;
+    lastFit = key;
     gGrid.style.setProperty('--vw', b.width + 'px');
     gGrid.style.setProperty('--vh', b.height + 'px');
     gGrid.style.setProperty('--ar', (b.width / b.height).toFixed(4));
@@ -587,8 +628,14 @@
   function loadThumbs() {
     cards.forEach(function (c) { var fr = c.querySelector('iframe'); if (!fr.getAttribute('src')) fr.src = fr.dataset.src; });
   }
-  if ('ResizeObserver' in window) new ResizeObserver(fitThumbs).observe(gGrid);
-  window.addEventListener('resize', fitThumbs);
+  var fitRaf = 0;
+  function fitSoon() { cancelAnimationFrame(fitRaf); fitRaf = requestAnimationFrame(fitThumbs); }
+  if ('ResizeObserver' in window) new ResizeObserver(fitSoon).observe(gGrid);
+  window.addEventListener('resize', function () {
+    fitSoon();
+    /* op een smal scherm geen gsm-kader en geen vergelijkweergave: het scherm is zelf al de gsm */
+    if (window.innerWidth <= 1180 && (state.mobile || state.split)) { state.mobile = false; state.split = false; apply(); }
+  });
 
   /* langzaam door het ontwerp scrollen zolang de muis erboven hangt */
   cards.forEach(function (c) {
@@ -596,7 +643,7 @@
     function win() { try { return fr.contentWindow; } catch (e) { return null; } }
     fr._stop = function () { cancelAnimationFrame(raf); };
     c.addEventListener('mouseenter', function () {
-      if (RM) return;
+      if (RM || !HOVER) return;
       var w = win(); if (!w) return;
       var t0 = 0;
       (function tick(ts) {
@@ -623,7 +670,8 @@
     if (busy) return;
     var card = gGrid.querySelector('.g-card[data-id="' + id + '"]');
     state.a = id; state.split = false; state.mobile = false;
-    if (state.view !== 'grid' || !card || RM) { state.view = 'detail'; apply(); return; }
+    if (isNarrow()) { state.mobile = false; state.split = false; }
+    if (state.view !== 'grid' || !card || RM || isNarrow()) { state.view = 'detail'; apply(); if (isNarrow()) window.scrollTo(0, 0); return; }
     busy = true;
     fitThumbs();
     stage.style.setProperty('--dx', '0px');
@@ -665,7 +713,7 @@
     state.view = 'grid'; apply();
     loadThumbs(); fitThumbs();
     var card = gGrid.querySelector('.g-card[data-id="' + id + '"]');
-    if (!card || RM) { enterGrid(); return; }
+    if (!card || RM || isNarrow()) { enterGrid(); if (card && isNarrow()) card.scrollIntoView({ block: 'center' }); return; }
     busy = true;
     card.scrollIntoView({ block: 'center' });
     var shot = card.querySelector('.g-shot'), r = shot.getBoundingClientRect(), g = stageBox();
@@ -738,8 +786,9 @@
   function check(v) {
     if (v.ext) return Promise.resolve(false);
     return fetch(v.f, { method: 'HEAD', cache: 'no-store' }).then(function (r) { return r.ok; }).catch(function () { return false; })
-      .then(function (ok) { var was = ready[v.id]; ready[v.id] = ok; return was !== ok; });
+      .then(function (ok) { var was = !!ready[v.id]; ready[v.id] = was || ok; return was !== ready[v.id]; });
   }
+  var polls = 0;
   function poll() {
     Promise.all(V.map(check)).then(function (ch) {
       var changed = ch.some(Boolean);
@@ -750,8 +799,9 @@
         if (byId(h)) state.view = 'detail'; else enterGrid();
       }
       if (changed) apply();
+      /* enkel opnieuw kijken zolang er nog een ontwerp ontbreekt */
       var pending = V.some(function (v) { return !v.ext && !ready[v.id]; });
-      setTimeout(poll, pending ? 8000 : 20000);
+      if (pending && ++polls < 15) setTimeout(poll, 8000);
     });
   }
   /* presentatie als startscherm */
