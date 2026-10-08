@@ -810,10 +810,15 @@
   });
   $('playPres').onclick = function () { openPres(''); };
   /* presentatie meteen openen, achter het laadscherm */
-  if (RM) dropLoader(false);
-  openPres('');
-  /* vangnet: na uiterlijk 4 s gaat het laadscherm toch weg, met een zachte fade */
-  setTimeout(function () { if (!ldDone) { dropLoader(true); sendGo(); } }, 4000);
+  /* wie uit de losse presentatie komt (#ontwerpen), gaat meteen naar de ontwerpen: geen laadscherm, geen presentatie */
+  var fromPres = location.hash === '#ontwerpen';
+  if (RM || fromPres) dropLoader(false);
+  if (fromPres) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+  else {
+    openPres('');
+    /* vangnet: na uiterlijk 4 s gaat het laadscherm toch weg, met een zachte fade */
+    setTimeout(function () { if (!ldDone) { dropLoader(true); sendGo(); } }, 4000);
+  }
 
   poll();
 })();
