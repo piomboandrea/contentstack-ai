@@ -783,8 +783,11 @@
   $('next').onclick = function () { step(1); };
   $('reload').onclick = function () { ['fA', 'fB'].forEach(function (f) { var el = $(f); if (el.dataset.src) { el.classList.add('loading'); el.src = el.dataset.src; } }); };
 
+  /* als los bestand geopend (file://) kan de browser niet controleren of een ontwerp bestaat: dan gewoon tonen */
+  var LOCAL = location.protocol === 'file:';
   function check(v) {
     if (v.ext) return Promise.resolve(false);
+    if (LOCAL) { var was0 = !!ready[v.id]; ready[v.id] = true; return Promise.resolve(!was0); }
     return fetch(v.f, { method: 'HEAD', cache: 'no-store' }).then(function (r) { return r.ok; }).catch(function () { return false; })
       .then(function (ok) { var was = !!ready[v.id]; ready[v.id] = was || ok; return was !== ready[v.id]; });
   }
@@ -806,12 +809,13 @@
   }
   /* presentatie als startscherm */
   function openPres(hash) {
-    fetch('presentatie.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
-      if (!r.ok) return;
+    var show = function () {
       $('presFrame').src = 'presentatie.html' + location.search + (hash || '');
       $('pres').classList.add('on');
       setTimeout(function () { try { $('presFrame').focus(); } catch (e) {} }, 300);
-    }).catch(function () {});
+    };
+    if (LOCAL) { show(); return; }
+    fetch('presentatie.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) { if (r.ok) show(); }).catch(function () {});
   }
   function closePres() {
     $('pres').classList.remove('on');
@@ -861,9 +865,11 @@
   $('playPres').onclick = function () { openPres(''); };
   /* presentatie meteen openen, achter het laadscherm */
   /* wie uit de losse presentatie komt (#ontwerpen), gaat meteen naar de ontwerpen: geen laadscherm, geen presentatie */
-  var fromPres = location.hash === '#ontwerpen';
+  /* geen presentatie bij terugkomst uit de presentatie of bij een rechtstreekse link naar een ontwerp of tab */
+  var h0 = location.hash.slice(1);
+  var fromPres = h0 === 'ontwerpen' || !!byId(h0) || h0 === 'werkt' || h0 === 'voorstel';
   if (RM || fromPres) dropLoader(false);
-  if (fromPres) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+  if (fromPres) { if (h0 === 'ontwerpen') { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } }
   else {
     openPres('');
     /* vangnet: na uiterlijk 4 s gaat het laadscherm toch weg, met een zachte fade */
