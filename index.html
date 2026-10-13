@@ -162,6 +162,10 @@
   .g-card { position: relative; display: block; width: 100%; text-align: left; border: 0; padding: 0; background: none; cursor: pointer; font: inherit; color: inherit; }
   .g-shot { position: relative; aspect-ratio: var(--ar, 1.6); border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(3,3,27,.06), 0 10px 30px -12px rgba(0,0,80,.25); transform-origin: 0 0; transition: box-shadow .3s ease; will-change: transform; }
   .g-shot iframe { position: absolute; left: 0; top: 0; width: var(--vw, 1440px); height: var(--vh, 900px); border: 0; transform-origin: 0 0; transform: scale(var(--s, .25)); pointer-events: none; background: #fff; }
+  /* miniatuur pas tonen als het ontwerp getekend is: tot dan een rustig skelet in bol-stijl, geen witte flits */
+  .g-shot { background: linear-gradient(#0000A4, #0000A4) 0 0 / 100% 9% no-repeat, linear-gradient(#EDF3FF, #EDF3FF) 8% 26% / 46% 9% no-repeat, linear-gradient(#EDF3FF, #EDF3FF) 8% 42% / 34% 5% no-repeat, #fff; }
+  .g-shot iframe { opacity: 0; transition: opacity .4s ease; }
+  .g-shot iframe.in { opacity: 1; }
   .g-shot::after { content: ""; position: absolute; inset: 0; border-radius: 16px; box-shadow: inset 0 0 0 2px var(--action); opacity: 0; transition: opacity .2s ease; pointer-events: none; }
   .g-lift { transition: transform .35s cubic-bezier(.2,.8,.2,1); }
   .g-card:hover .g-lift, .g-card:focus-visible .g-lift { transform: translateY(-6px); }
@@ -626,7 +630,13 @@
     cards.forEach(function (c) { var s = c.querySelector('.g-shot'); var w = s.clientWidth; if (w) s.style.setProperty('--s', (w / b.width).toFixed(4)); });
   }
   function loadThumbs() {
-    cards.forEach(function (c) { var fr = c.querySelector('iframe'); if (!fr.getAttribute('src')) fr.src = fr.dataset.src; });
+    /* eerst de juiste maat, dan pas laden: anders tekent elk ontwerp zich twee keer */
+    fitThumbs();
+    cards.forEach(function (c) {
+      var fr = c.querySelector('iframe'); if (fr.getAttribute('src')) return;
+      fr.addEventListener('load', function () { setTimeout(function () { fr.classList.add('in'); }, 250); }, { once: true });
+      fr.src = fr.dataset.src;
+    });
   }
   var fitRaf = 0;
   function fitSoon() { cancelAnimationFrame(fitRaf); fitRaf = requestAnimationFrame(fitThumbs); }
