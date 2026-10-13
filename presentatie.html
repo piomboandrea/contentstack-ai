@@ -386,6 +386,51 @@
   .iso span{font:400 13px/1.35 var(--fb);color:var(--mid)}
   .iso b{display:block;font:700 16px/1.2 var(--fd);color:var(--blue)}
 
+  .c7-hl .c7-box{background:var(--yel);color:var(--blue);box-shadow:0 0 0 6px rgba(253,181,1,.28)}
+  .c7-hl .c7-dot{background:var(--blue)}
+  .c7-hl .c7-ring{border-color:var(--yel)}
+
+  /* Selligent */
+  .sel{background:var(--grey)}
+  .c8{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) 84px minmax(0,1.05fr) 84px minmax(0,.95fr);grid-template-rows:minmax(0,1fr) auto;align-items:center;row-gap:20px}
+  .c8-ai{display:flex;flex-direction:column;gap:16px}
+  .c8-prompt{display:flex;align-items:center;gap:12px;padding:12px 16px 12px 12px;background:#fff;border:2px solid var(--line);border-radius:16px;box-shadow:var(--shL)}
+  .c8-prompt.typing{border-color:var(--act)}
+  .c8-prompt .c1-ai{width:40px;height:40px}
+  .c8-prompt.typing .caret i{animation:none}
+  .c8-ptx{flex:1;margin:0;font:400 15px/1.4 var(--fb);color:var(--ink)}
+  .c8-core{background:var(--blue);color:#fff;border-radius:24px;padding:22px 24px;box-shadow:0 30px 60px -20px rgba(0,0,164,.45)}
+  .c8-core h3{margin:0;font:900 clamp(22px,2vw,30px)/1 var(--fd)}
+  .c8-core p{margin:6px 0 14px;font:600 13px var(--fb);color:var(--low)}
+  .c8-arrow{position:relative;height:2px;margin:0 10px;background:repeating-linear-gradient(90deg,var(--act) 0 6px,transparent 6px 12px)}
+  .c8-arrow i{position:absolute;left:0;top:-5px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--yel);opacity:0}
+  .c8-arrow b{display:none}
+  .c8-arrow::after{content:"";position:absolute;right:-4px;top:-6px;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:10px solid var(--act)}
+  .c8-api{background:#fff;border-radius:16px;box-shadow:var(--shL);overflow:hidden;min-width:0}
+  .c8-api-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);font:600 13px var(--fb);color:var(--mid)}
+  .c8-chip{font:600 12px var(--fb);color:var(--blue);background:var(--min);padding:3px 8px;border-radius:4px}
+  .c8-calls{list-style:none;margin:0;padding:10px;display:flex;flex-direction:column;gap:6px}
+  .c8-call{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:8px;background:var(--grey);font:400 13px var(--fb);color:var(--ink)}
+  .c8-call code{flex:none;font:700 11px ui-monospace,Menlo,Consolas,monospace;color:#045338;background:#E3F5EC;padding:3px 6px;border-radius:4px}
+  .c8-call span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .c8-call .ok{flex:none;width:22px;height:22px;border-radius:50%;background:var(--act);color:#fff;display:grid;place-items:center}
+  .c8-call .ok svg{width:13px;height:13px}
+  .c8-mail{justify-self:center;width:100%;max-width:330px;background:#fff;border-radius:16px;box-shadow:var(--shL);overflow:hidden}
+  .c8-mail-h{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line);font:600 13px var(--fb)}
+  .c8-mail-b{display:flex;flex-direction:column;gap:6px;padding:10px;background:var(--grey)}
+  .mb{border-radius:6px;background:#fff}
+  .mb-head{height:30px;display:flex;align-items:center;padding:0 12px;background:var(--blue);color:#fff;font:900 15px var(--fd)}
+  .mb-hero{height:clamp(64px,10vh,96px);display:flex;align-items:flex-end;padding:10px 12px;background:var(--low);font:700 14px/1.15 var(--fd);color:var(--blue)}
+  .mb-text{display:flex;flex-direction:column;gap:6px;padding:10px 12px}
+  .mb-text i,.mb-foot i{display:block;height:6px;border-radius:4px;background:var(--line)}
+  .mb-text i.s,.mb-foot i.s{width:60%}
+  .mb-cta{padding:8px 12px}
+  .mb-cta span{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:6px;background:var(--act);color:#fff;font:600 11px var(--fb)}
+  .mb-foot{display:flex;flex-direction:column;gap:5px;padding:8px 12px;background:transparent}
+  .mb-foot i{height:4px}
+  .c8-note{grid-column:1/-1;justify-self:center;display:inline-flex;align-items:center;gap:10px;margin:0;padding:10px 18px 10px 12px;background:#fff;border-radius:40px;box-shadow:var(--sh1);font:600 14px/1.3 var(--fb);color:var(--ink)}
+  .c8-note svg{flex:none;width:24px;height:24px}
+
   /* 8: slot */
   .slot .inner{justify-content:center;align-items:center;text-align:center}
   .slot .copy{max-width:1200px;margin:0 auto 40px}
@@ -547,6 +592,24 @@
     .c7-core .c7-ring{left:-70px;top:-70px;width:140px;height:140px}
     .c7-plus .c7-box{width:44px;height:44px;min-height:0}
     .s8 .ttl{font-size:44px}
+    .sel .vis{flex:none}
+    .c8{position:relative;inset:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:none;row-gap:8px}
+    .c8-ai{gap:8px}
+    .c8-prompt{padding:8px 10px}
+    .c8-prompt .c1-ai{width:32px;height:32px}
+    .c8-ptx{font-size:14px}
+    .c8-core{display:flex;align-items:baseline;gap:8px;padding:12px 16px;border-radius:16px}
+    .c8-core p{margin:0}
+    .c8-core .c5-tags{display:none}
+    .c8-arrow{justify-self:center;width:2px;height:34px;margin:0;background:repeating-linear-gradient(180deg,var(--act) 0 5px,transparent 5px 10px)}
+    .c8-arrow i{display:none}
+    .c8-arrow::after{right:auto;top:auto;left:-6px;bottom:-4px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--act);border-bottom:0}
+    .c8-a1 b{display:block;position:absolute;left:12px;top:50%;transform:translateY(-50%);white-space:nowrap;font:600 11px var(--fb);color:var(--blue);background:var(--min);padding:2px 8px;border-radius:4px}
+    .c8-api,.c8-a2{display:none}
+    .c8-mail{max-width:none}
+    .mb-hero{height:54px;font-size:13px}
+    .c8-note{font-size:12px;padding:8px 14px 8px 8px;border-radius:16px}
+    .c8-note svg{width:20px;height:20px}
     .s9 .ttl{font-size:34px}
     .c9{gap:20px}
     .c9-steps{grid-template-columns:1fr;gap:16px}
@@ -697,6 +760,7 @@
   };
 
   /* ---------- inhoud (uit content.json en index.html) ---------- */
+  const MAILPROMPT = 'Maak een mail over de nieuwe fulfilmentpartners.';
   const PROMPT = 'Herontwerp de pagina Fulfilment Partners in bol-stijl. Maak zeven richtingen.';
   const TYPES = ['banner_with_image', 'usp_list', 'step_by_step_card', 'usp_cards', 'text_snippet', 'card_carousel', 'faq'];
   const BLOCKS = [
@@ -733,7 +797,8 @@
   const FAQ_A0 = 'Zeker niet. Of logistieke ondersteuning interessant is, hangt af van je ambities en assortiment, niet alleen van je omvang.';
   const S1 = 'Maak de knoppen hoger en zet de partners naast elkaar.';
   const S2 = 'Voeg een FAQ toe.';
-  const NODES = ['Spelling- en tooncheck', 'Meerdere talen', 'Selligent/Site', 'Campagnes', 'Snelheid', 'Toegankelijkheid'];
+  const NODES = ['Spelling- en tooncheck', 'Meerdere talen', 'Toegankelijkheid', 'Campagnes', 'Snelheid', 'Selligent/Site'];
+  const NODE_HL = 'Selligent/Site';
 
   /* ---------- hulpjes ---------- */
   function rel(el, box) {
@@ -1270,7 +1335,7 @@
         vis.innerHTML = '<div class="c7"><svg class="c7-svg" aria-hidden="true"></svg>' +
           '<div class="c7-pos c7-core"><span class="c7-ring"></span><div class="c7-anim"><div class="c7-box"><img class="c7-logo" src="img/dignify-logo.png" alt="Dignify" width="196" height="130"><b>AI-tussenlaag</b></div></div></div>' +
           '<ul class="sr">' + NODES.map(function (n) { return '<li>' + n + '</li>'; }).join('') + '<li>en meer koppelingen</li></ul>' +
-          NODES.map(function (n) { return '<div class="c7-pos c7-node" aria-hidden="true"><span class="c7-ring"></span><div class="c7-anim"><div class="c7-box"><i class="c7-dot"></i>' + n + '</div></div></div>'; }).join('') +
+          NODES.map(function (n) { return '<div class="c7-pos c7-node' + (n === NODE_HL ? ' c7-hl' : '') + '" aria-hidden="true"><span class="c7-ring"></span><div class="c7-anim"><div class="c7-box"><i class="c7-dot"></i>' + n + '</div></div></div>'; }).join('') +
           '<div class="c7-pos c7-node c7-plus" aria-hidden="true"><span class="c7-ring"></span><div class="c7-anim"><div class="c7-box">' + I.plus + '</div></div></div></div>';
         layout7(vis);
       },
@@ -1292,6 +1357,58 @@
           extra.push(G.fromTo(plus.querySelector('.c7-ring'), { scale: .8, autoAlpha: .9 }, { scale: 2, autoAlpha: 0, duration: 1.5, repeat: -1, ease: 'power1.out' }));
           extra.push(G.to(plus.querySelector('.c7-anim'), { scale: 1.1, duration: .75, yoyo: true, repeat: -1, ease: 'sine.inOut' }));
         }, null, 1.3 + nodes.length * .55 + .4);
+      }
+    },
+    {
+      nav: 'Selligent', cls: 'sel', title: 'Dezelfde aanpak, ook in Selligent', a11y: true,
+      sub: 'Selligent heeft geen MCP, maar wel een REST API om contentblokken aan te maken. Zo bouwt de AI ook e-mails op, als concept.',
+      render: function (vis) {
+        const calls = [['header', 'mb-head'], ['hero', 'mb-hero'], ['tekst', 'mb-text'], ['knop', 'mb-cta'], ['footer', 'mb-foot']];
+        vis.innerHTML = '<div class="c8">' +
+          '<div class="c8-ai"><div class="c8-prompt"><span class="c1-ai">' + I.spark + '</span><p class="c8-ptx"><span class="c8-tx">' + MAILPROMPT + '</span><span class="caret"><i></i></span></p></div>' +
+            '<div class="c8-core"><h3>AI-tussenlaag</h3><p>Dignify</p><div class="c5-tags"><span>huisstijl</span><span>bloktypes</span><span>controles</span></div></div></div>' +
+          '<div class="c8-arrow c8-a1" aria-hidden="true"><i></i><b>REST API</b></div>' +
+          '<div class="c8-api"><div class="c8-api-h"><span class="c8-chip">REST API</span>Selligent</div><ul class="c8-calls">' +
+            calls.map(function (c) { return '<li class="c8-call"><code>POST</code><span>contentblok ' + c[0] + '</span><i class="ok">' + I.check + '</i></li>'; }).join('') + '</ul></div>' +
+          '<div class="c8-arrow c8-a2" aria-hidden="true"><i></i></div>' +
+          '<div class="c8-mail"><div class="c8-mail-h">Selligent<span class="c5-badge">Concept</span></div><div class="c8-mail-b">' +
+            '<div class="mb mb-head">bol.</div>' +
+            '<div class="mb mb-hero"><span>Nieuwe fulfilmentpartners voor jouw winkel</span></div>' +
+            '<div class="mb mb-text"><i></i><i></i><i class="s"></i></div>' +
+            '<div class="mb mb-cta"><span>Vind jouw partner</span></div>' +
+            '<div class="mb mb-foot"><i></i><i class="s"></i></div>' +
+          '</div></div>' +
+          '<p class="c8-note">' + I.checkC + '<span>Eén set huisstijlregels voor pagina\'s in Contentstack en mails in Selligent</span></p>' +
+          '</div>';
+      },
+      build: function (t, vis, sc) {
+        const q = function (s) { return vis.querySelector(s); };
+        const prompt = q('.c8-prompt'), calls = qa(vis, '.c8-call'), blocks = qa(vis, '.mb'), d1 = q('.c8-a1 i'), d2 = q('.c8-a2 i');
+        const mob = window.innerWidth <= 767;
+        const scr = vis.closest('.inner');
+        if (scr) scr.scrollTop = 0;
+        copyIn(t, sc, 0);
+        t.from(prompt, { autoAlpha: 0, y: 16, duration: .6, ease: 'power3.out' }, .3);
+        t.from(q('.c8-core'), { autoAlpha: 0, scale: .92, duration: .6, ease: 'back.out(1.6)' }, .45);
+        t.from(qa(vis, '.c8-api, .c8-mail, .c8-arrow'), { autoAlpha: 0, y: 18, duration: .6, stagger: .1, ease: 'power3.out' }, .6);
+        G.set(calls, { autoAlpha: 0, x: -14 });
+        G.set(blocks, { autoAlpha: 0, y: 12 });
+        G.set(qa(vis, '.c8-call .ok'), { scale: 0 });
+        const E = typeIn(t, prompt, q('.c8-tx'), MAILPROMPT, 1) + .3;
+        t.to(q('.c8-core'), { scale: 1.04, duration: .18, yoyo: true, repeat: 1, ease: 'power2.out' }, E);
+        calls.forEach(function (c, k) {
+          const at = E + .35 + k * .6;
+          if (!mob) t.fromTo(d1, { left: '0%', autoAlpha: 1 }, { left: '100%', autoAlpha: 0, duration: .35, ease: 'power1.in' }, at);
+          t.to(c, { autoAlpha: 1, x: 0, duration: .35, ease: 'power3.out' }, at + .2);
+          t.to(c.querySelector('.ok'), { scale: 1, duration: .35, ease: 'back.out(2.6)' }, at + .4);
+          if (!mob) t.fromTo(d2, { left: '0%', autoAlpha: 1 }, { left: '100%', autoAlpha: 0, duration: .3, ease: 'power1.in' }, at + .4);
+          t.to(blocks[k], { autoAlpha: 1, y: 0, duration: .45, ease: 'power3.out' }, at + .6);
+          t.fromTo(blocks[k], { boxShadow: '0 0 0 2px rgba(0,0,255,1)' }, { boxShadow: '0 0 0 2px rgba(0,0,255,0)', duration: .8, ease: 'power2.out' }, at + .7);
+        });
+        const T = E + .35 + calls.length * .6 + .4;
+        t.from(q('.c8-mail-h .c5-badge'), { scale: 0, duration: .45, ease: 'back.out(3)' }, T);
+        t.from(q('.c8-note'), { autoAlpha: 0, y: 12, duration: .5, ease: 'power3.out' }, T + .25);
+        if (scr) t.call(function () { const d = scr.scrollHeight - scr.clientHeight; if (d > 4) scr.scrollTo({ top: d, behavior: RM ? 'auto' : 'smooth' }); }, null, E + .3);
       }
     },
     {
@@ -1372,8 +1489,10 @@
   function layout7(vis) {
     const c7 = vis.querySelector('.c7'), W = c7.clientWidth, H = c7.clientHeight, mob = W < 600;
     const cx = W / 2, cy = H / 2;
-    const rx = mob ? W / 2 - 62 : Math.min(W / 2 - 130, 440), ry = mob ? H / 2 - 44 : Math.min(H / 2 - 34, 230);
     const pos = qa(c7, '.c7-pos');
+    /* op gsm: het breedste label moet volledig binnen het scherm blijven */
+    const maxHW = Math.max.apply(null, pos.slice(1).map(function (p) { const b = p.querySelector('.c7-box'); return b ? b.offsetWidth / 2 : 60; }));
+    const rx = mob ? Math.min(W / 2 - 62, W / 2 - maxHW - 4) : Math.min(W / 2 - 130, 440), ry = mob ? H / 2 - 44 : Math.min(H / 2 - 34, 230);
     pos[0].style.left = cx + 'px'; pos[0].style.top = cy + 'px';
     const pts = [];
     for (let i = 1; i < pos.length; i++) {
