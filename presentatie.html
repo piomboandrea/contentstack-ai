@@ -387,11 +387,24 @@
   .iso b{display:block;font:700 16px/1.2 var(--fd);color:var(--blue)}
 
   /* 8: slot */
-  .s8 .inner{justify-content:center;align-items:center;text-align:center}
-  .s8 .copy{max-width:1200px;margin:0 auto 40px}
+  .slot .inner{justify-content:center;align-items:center;text-align:center}
+  .slot .copy{max-width:1200px;margin:0 auto 40px}
   .s8 .ttl{font-size:clamp(44px,7.4vw,120px);line-height:.98}
-  .s8 .sub{margin-left:auto;margin-right:auto}
-  .s8 .vis{flex:none;display:flex;flex-direction:column;align-items:center;gap:40px}
+  .slot .sub{margin-left:auto;margin-right:auto}
+  .slot .vis{flex:none;display:flex;flex-direction:column;align-items:center;gap:40px}
+  .s9 .ttl{font-size:clamp(40px,5.6vw,88px);line-height:1}
+  /* centreren zonder dat de bovenkant wegvalt als de inhoud moet scrollen */
+  .slot .inner{justify-content:flex-start}
+  .slot .copy{margin-top:auto}
+  .slot .vis{margin-bottom:auto}
+  .c9{display:flex;flex-direction:column;align-items:center;gap:36px;width:min(1080px,100%)}
+  .c9-steps{position:relative;list-style:none;margin:0;padding:0;width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
+  .c9-line{position:absolute;left:16.66%;right:16.66%;top:27px;height:2px;background:var(--low);transform-origin:0 50%}
+  .c9-step{position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+  .c9-n{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--yel);color:var(--blue);font:900 24px/1 var(--fd);box-shadow:0 0 0 8px #fff}
+  .c9-step h3{margin:0 0 6px;font:700 22px/1.15 var(--fd);color:var(--blue)}
+  .c9-step p{margin:0 auto;max-width:280px;font-size:15px;line-height:1.5;color:var(--mid)}
+  .c9-thx{margin:0;font:700 18px var(--fd);color:var(--blue)}
   .btn-yel{min-height:64px;padding:0 32px 0 36px;border:0;border-radius:8px;background:var(--yel);color:var(--ink);font:600 18px var(--fb);display:inline-flex;align-items:center;gap:14px;cursor:pointer;box-shadow:var(--sh2)}
   .btn-yel:hover{background:var(--yel-h)}
   .btn-yel svg{width:22px;height:22px}
@@ -534,6 +547,15 @@
     .c7-core .c7-ring{left:-70px;top:-70px;width:140px;height:140px}
     .c7-plus .c7-box{width:44px;height:44px;min-height:0}
     .s8 .ttl{font-size:44px}
+    .s9 .ttl{font-size:34px}
+    .c9{gap:20px}
+    .c9-steps{grid-template-columns:1fr;gap:16px}
+    .c9-line{left:23px;right:auto;top:24px;bottom:24px;width:2px;height:auto;transform-origin:50% 0}
+    .c9-step{flex-direction:row;align-items:flex-start;gap:14px;text-align:left}
+    .c9-n{flex:none;width:48px;height:48px;font-size:20px;box-shadow:0 0 0 6px #fff}
+    .c9-step h3{font-size:18px;margin:2px 0 4px}
+    .c9-step p{max-width:none;font-size:14px;line-height:1.45}
+    .c9-thx{font-size:16px}
     .iso{margin-top:12px;gap:10px;padding:6px 14px 6px 6px}
     .iso img{width:40px;height:40px}
     .iso b{font-size:14px}
@@ -589,13 +611,20 @@
     .copy{margin-bottom:12px}
     .ttl{font-size:26px}
     .sub{margin-top:4px;font-size:14px}
-    .s1 .copy,.s8 .copy{margin-bottom:18px}
+    .s1 .copy,.slot .copy{margin-bottom:18px}
     .s8 .ttl{font-size:40px}
+    .s9 .ttl{font-size:30px}
+    .c9{gap:14px}
+    .c9-step{gap:8px}
+    .c9-n{width:44px;height:44px;font-size:20px}
+    .c9-step h3{font-size:17px}
+    .c9-step p{font-size:13px}
+    .c9-line{top:21px}
     .iso{margin-top:8px;padding:4px 14px 4px 4px}
     .iso img{width:36px;height:36px}
-    .s8 .vis{gap:18px}
+    .slot .vis{gap:18px}
     .vis{flex:none;height:380px}
-    .s1 .vis,.s8 .vis{height:auto}
+    .s1 .vis,.slot .vis{height:auto}
   }
   @media (prefers-reduced-motion:reduce){.caret i{animation:none}}
 </style>
@@ -1266,7 +1295,27 @@
       }
     },
     {
-      nav: 'Ontwerpen', title: 'Bekijk de zeven ontwerpen', sub: 'Elk ontwerp gebruikt de echte inhoud en de huisstijl van bol.', a11y: true,
+      nav: 'Aan de slag', cls: 'slot s9', title: 'Klaar om samen te bouwen?', sub: 'We beginnen met een workshop met jullie team.', a11y: true,
+      render: function (vis) {
+        const steps = [
+          ['Needs in kaart', 'Welke pagina\'s, welke blokken en welke koppelingen jullie nodig hebben.'],
+          ['Inplannen', 'Samen kiezen we waar we starten en wat eerst komt.'],
+          ['Bouwen', 'Dignify bouwt de tussenlaag, jullie team stuurt bij.']
+        ];
+        vis.innerHTML = '<div class="c9"><ol class="c9-steps"><span class="c9-line" aria-hidden="true"></span>' +
+          steps.map(function (s, i) { return '<li class="c9-step"><span class="c9-n">' + (i + 1) + '</span><div><h3>' + s[0] + '</h3><p>' + s[1] + '</p></div></li>'; }).join('') +
+          '</ol><p class="c9-thx">Bedankt voor jullie tijd.</p></div>';
+      },
+      build: function (t, vis, sc) {
+        copyIn(t, sc, 0);
+        t.from(qa(vis, '.c9-step'), { autoAlpha: 0, y: 30, duration: .7, stagger: .35, ease: 'power3.out' }, .6);
+        t.from(qa(vis, '.c9-n'), { scale: 0, duration: .5, stagger: .35, ease: 'back.out(2.4)' }, .75);
+        t.fromTo(vis.querySelector('.c9-line'), { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: 'power2.inOut' }, .8);
+        t.from(vis.querySelector('.c9-thx'), { autoAlpha: 0, y: 12, duration: .6, ease: 'power3.out' }, 2.1);
+      }
+    },
+    {
+      nav: 'Ontwerpen', cls: 'slot s8', title: 'Bekijk de zeven ontwerpen', sub: 'Elk ontwerp gebruikt de echte inhoud en de huisstijl van bol.', a11y: true,
       render: function (vis) {
         vis.innerHTML = '<button type="button" class="btn-yel" id="toDesigns">Naar de ontwerpen ' + I.arrowR + '</button><div class="c8-tiles" aria-hidden="true">' + '<i></i>'.repeat(7) + '</div>';
         vis.querySelector('#toDesigns').addEventListener('click', close);
@@ -1360,7 +1409,7 @@
 
   const scenes = CH.map(function (c, i) {
     const s = document.createElement('section');
-    s.className = 'scene s' + (i + 1) + (c.dark ? ' dark' : '');
+    s.className = 'scene ' + (c.cls || ('s' + (i + 1))) + (c.dark ? ' dark' : '');
     s.setAttribute('aria-labelledby', 't' + (i + 1));
     s.innerHTML = '<div class="inner"><div class="copy"><h2 class="ttl" id="t' + (i + 1) + '">' + words(c.title) + '</h2><p class="sub">' + c.sub + '</p>' + (c.copyX || '') + '</div><div class="vis"' + (c.a11y ? '' : ' aria-hidden="true"') + '></div></div>';
     s.inert = true;
