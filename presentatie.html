@@ -1361,24 +1361,24 @@
     },
     {
       nav: 'E-mails', cls: 'sel', title: 'Dezelfde aanpak, ook voor e-mails', a11y: true,
-      sub: 'Selligent heeft geen MCP, maar wel een REST API om contentblokken aan te maken. Zo bouwt de AI ook e-mails op, als concept.',
+      sub: 'Via een REST API roept de AI ook de contentblokken van jullie e-mails aan. Zo bouwt ze ook e-mails op, als concept.',
       render: function (vis) {
         const calls = [['header', 'mb-head'], ['hero', 'mb-hero'], ['tekst', 'mb-text'], ['knop', 'mb-cta'], ['footer', 'mb-foot']];
         vis.innerHTML = '<div class="c8">' +
           '<div class="c8-ai"><div class="c8-prompt"><span class="c1-ai">' + I.spark + '</span><p class="c8-ptx"><span class="c8-tx">' + MAILPROMPT + '</span><span class="caret"><i></i></span></p></div>' +
             '<div class="c8-core"><h3>AI-tussenlaag</h3><p>Dignify</p><div class="c5-tags"><span>huisstijl</span><span>bloktypes</span><span>controles</span></div></div></div>' +
           '<div class="c8-arrow c8-a1" aria-hidden="true"><i></i><b>REST API</b></div>' +
-          '<div class="c8-api"><div class="c8-api-h"><span class="c8-chip">REST API</span>Selligent</div><ul class="c8-calls">' +
+          '<div class="c8-api"><div class="c8-api-h"><span class="c8-chip">REST API</span>E-mailplatform</div><ul class="c8-calls">' +
             calls.map(function (c) { return '<li class="c8-call"><code>POST</code><span>contentblok ' + c[0] + '</span><i class="ok">' + I.check + '</i></li>'; }).join('') + '</ul></div>' +
           '<div class="c8-arrow c8-a2" aria-hidden="true"><i></i></div>' +
-          '<div class="c8-mail"><div class="c8-mail-h">Selligent<span class="c5-badge">Concept</span></div><div class="c8-mail-b">' +
+          '<div class="c8-mail"><div class="c8-mail-h">E-mail<span class="c5-badge">Concept</span></div><div class="c8-mail-b">' +
             '<div class="mb mb-head">bol.</div>' +
             '<div class="mb mb-hero"><span>Nieuwe fulfilmentpartners voor jouw winkel</span></div>' +
             '<div class="mb mb-text"><i></i><i></i><i class="s"></i></div>' +
             '<div class="mb mb-cta"><span>Vind jouw partner</span></div>' +
             '<div class="mb mb-foot"><i></i><i class="s"></i></div>' +
           '</div></div>' +
-          '<p class="c8-note">' + I.checkC + '<span>Eén set huisstijlregels voor pagina\'s in Contentstack en mails in Selligent</span></p>' +
+          '<p class="c8-note">' + I.checkC + '<span>Eén set huisstijlregels voor pagina\'s in Contentstack en voor e-mails</span></p>' +
           '</div>';
       },
       build: function (t, vis, sc) {
