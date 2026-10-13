@@ -808,7 +808,7 @@
   function openPres(hash) {
     fetch('presentatie.html', { method: 'HEAD', cache: 'no-store' }).then(function (r) {
       if (!r.ok) return;
-      $('presFrame').src = 'presentatie.html' + (hash || '');
+      $('presFrame').src = 'presentatie.html' + location.search + (hash || '');
       $('pres').classList.add('on');
       setTimeout(function () { try { $('presFrame').focus(); } catch (e) {} }, 300);
     }).catch(function () {});

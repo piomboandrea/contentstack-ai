@@ -381,6 +381,11 @@
   .c7-core .c7-ring{left:-112px;top:-112px;width:224px;height:224px}
   .c7-plus .c7-ring{left:-34px;top:-34px;width:68px;height:68px;border-color:var(--yel)}
 
+  .iso{display:inline-flex;align-items:center;gap:14px;margin-top:18px;padding:8px 20px 8px 8px;border-radius:40px;background:#fff;box-shadow:0 20px 40px -20px rgba(0,0,40,.55)}
+  .iso img{flex:none;display:block;width:56px;height:56px;border-radius:50%}
+  .iso span{font:400 13px/1.35 var(--fb);color:var(--mid)}
+  .iso b{display:block;font:700 16px/1.2 var(--fd);color:var(--blue)}
+
   /* 8: slot */
   .s8 .inner{justify-content:center;align-items:center;text-align:center}
   .s8 .copy{max-width:1200px;margin:0 auto 40px}
@@ -529,6 +534,10 @@
     .c7-core .c7-ring{left:-70px;top:-70px;width:140px;height:140px}
     .c7-plus .c7-box{width:44px;height:44px;min-height:0}
     .s8 .ttl{font-size:44px}
+    .iso{margin-top:12px;gap:10px;padding:6px 14px 6px 6px}
+    .iso img{width:40px;height:40px}
+    .iso b{font-size:14px}
+    .iso span{font-size:12px}
     .btn-yel{min-height:56px;font-size:16px;padding:0 24px}
     .c8-tiles{gap:6px}
     .c8-tiles i{width:40px;height:28px}
@@ -582,6 +591,8 @@
     .sub{margin-top:4px;font-size:14px}
     .s1 .copy,.s8 .copy{margin-bottom:18px}
     .s8 .ttl{font-size:40px}
+    .iso{margin-top:8px;padding:4px 14px 4px 4px}
+    .iso img{width:36px;height:36px}
     .s8 .vis{gap:18px}
     .vis{flex:none;height:380px}
     .s1 .vis,.s8 .vis{height:auto}
@@ -819,6 +830,13 @@
   }
 
   /* ---------- hoofdstukken ---------- */
+  /* ===== INSTELLING =====
+     Hoofdstuk Ontwerpen en de knop Sla over tonen? false = verborgen, true = zichtbaar.
+     Zonder deze regel te wijzigen kan het ook per link: zet ?ontwerpen=1 achter de link,
+     bv. https://contentstack-ai-hvkp.onrender.com/?ontwerpen=1 */
+  const TOON_ONTWERPEN = false;
+  const ONTWERPEN = TOON_ONTWERPEN || /[?&]ontwerpen=1(&|$)/.test(location.search);
+
   const CH = [
     {
       nav: 'Eén prompt', title: 'Alles begint met één zin', sub: 'Je beschrijft in gewone taal wat je wilt.',
@@ -841,32 +859,43 @@
           t.from([ai, send], { autoAlpha: 0, scale: .6, duration: .35, stagger: .08, ease: 'back.out(2)' }, .5);
           T = .7;
         }
-        const E = typeIn(t, field, tx, PROMPT, T) + .34;
-        /* Enter met gewicht: toets en knop drukken in, het veld veert, een ring slaat uit en de burst vult het scherm */
-        t.to(caret, { autoAlpha: 0, duration: .08 }, E);
-        t.to(kbd, { y: 2, scale: .9, duration: .08, ease: 'power2.out' }, E);
-        t.to(kbd, { y: 0, scale: 1, duration: .3, ease: 'back.out(3)' }, E + .1);
-        t.to(go, { scale: .82, duration: .08, ease: 'power2.out' }, E);
-        t.to(go, { scale: 1, duration: .45, ease: 'back.out(3)' }, E + .1);
-        t.to(field, { scale: .985, duration: .08, ease: 'power2.out' }, E);
-        t.to(field, { scale: 1, duration: .6, ease: 'elastic.out(1,.45)' }, E + .1);
-        t.fromTo(ring, { autoAlpha: 1, scaleX: 1, scaleY: 1 }, {
-          autoAlpha: 0,
-          scaleX: function () { return 1 + 28 / Math.max(1, field.offsetWidth); },
-          scaleY: function () { return 1 + 28 / Math.max(1, field.offsetHeight); },
-          duration: .6, ease: 'power2.out', immediateRender: false
-        }, E + .02);
-        const burst = $('burst');
-        t.fromTo(burst, {
-          x: function () { const r = go.getBoundingClientRect(); return r.left + r.width / 2; },
-          y: function () { const r = go.getBoundingClientRect(); return r.top + r.height / 2; },
-          scale: 0, autoAlpha: 1
-        }, {
-          scale: function () { return Math.hypot(window.innerWidth, window.innerHeight) / 40 + .5; },
-          duration: .72, ease: 'power3.in', immediateRender: false
-        }, E + .12);
-        t.call(function () { $('app').dataset.tone = 'dark'; }, null, E + .66);
-        t.call(function () { if (cur === 1) goTo(2, { fromBurst: true }); }, null, E + .9);
+        const E0 = typeIn(t, field, tx, PROMPT, T) + .34;
+        /* de prompt staat klaar: niet zelf doorgaan, Volgende (of pijltje, spatie) drukt op Enter */
+        t.to({}, { duration: .01 }, E0);
+        send.style.cursor = 'pointer';
+        send.addEventListener('click', function () { if (c1Go) c1Go(); });
+        c1Go = function () {
+          c1Go = null;
+          if (tl) tl.progress(1);
+          markReady(false);
+          const t = G.timeline(), E = 0;
+          extra.push(t);
+          /* Enter met gewicht: toets en knop drukken in, het veld veert, een ring slaat uit en de burst vult het scherm */
+          t.to(caret, { autoAlpha: 0, duration: .08 }, E);
+          t.to(kbd, { y: 2, scale: .9, duration: .08, ease: 'power2.out' }, E);
+          t.to(kbd, { y: 0, scale: 1, duration: .3, ease: 'back.out(3)' }, E + .1);
+          t.to(go, { scale: .82, duration: .08, ease: 'power2.out' }, E);
+          t.to(go, { scale: 1, duration: .45, ease: 'back.out(3)' }, E + .1);
+          t.to(field, { scale: .985, duration: .08, ease: 'power2.out' }, E);
+          t.to(field, { scale: 1, duration: .6, ease: 'elastic.out(1,.45)' }, E + .1);
+          t.fromTo(ring, { autoAlpha: 1, scaleX: 1, scaleY: 1 }, {
+            autoAlpha: 0,
+            scaleX: function () { return 1 + 28 / Math.max(1, field.offsetWidth); },
+            scaleY: function () { return 1 + 28 / Math.max(1, field.offsetHeight); },
+            duration: .6, ease: 'power2.out', immediateRender: false
+          }, E + .02);
+          const burst = $('burst');
+          t.fromTo(burst, {
+            x: function () { const r = go.getBoundingClientRect(); return r.left + r.width / 2; },
+            y: function () { const r = go.getBoundingClientRect(); return r.top + r.height / 2; },
+            scale: 0, autoAlpha: 1
+          }, {
+            scale: function () { return Math.hypot(window.innerWidth, window.innerHeight) / 40 + .5; },
+            duration: .72, ease: 'power3.in', immediateRender: false
+          }, E + .12);
+          t.call(function () { $('app').dataset.tone = 'dark'; }, null, E + .66);
+          t.call(function () { if (cur === 1) goTo(2, { fromBurst: true }); }, null, E + .9);
+        };
       }
     },
     {
@@ -1207,6 +1236,7 @@
     },
     {
       nav: 'Daarna', title: 'Een laag die meegroeit', sub: 'Elke koppeling maakt de tussenlaag slimmer.', dark: true, a11y: true, layout: true,
+      copyX: '<div class="iso"><img src="img/iso-27001.png" alt="ISO 27001" width="56" height="56"><span><b>ISO 27001-gecertificeerd</b>Strikte procedures rond data en security</span></div>',
       render: function (vis) {
         vis.innerHTML = '<div class="c7"><svg class="c7-svg" aria-hidden="true"></svg>' +
           '<div class="c7-pos c7-core"><span class="c7-ring"></span><div class="c7-anim"><div class="c7-box"><img class="c7-logo" src="img/dignify-logo.png" alt="Dignify" width="196" height="130"><b>AI-tussenlaag</b></div></div></div>' +
@@ -1219,6 +1249,7 @@
         const c7 = vis.querySelector('.c7'), core = c7.querySelector('.c7-core');
         const nodes = qa(c7, '.c7-node'), paths = qa(c7, '.c7-svg path'), pts = c7._pts || [];
         copyIn(t, sc, 0);
+        t.from(sc.querySelector('.iso'), { autoAlpha: 0, y: 14, duration: .55, ease: 'power3.out' }, .55);
         t.from(core.querySelector('.c7-anim'), { scale: 0, duration: .8, ease: 'back.out(1.7)' }, .3);
         t.fromTo(core.querySelector('.c7-ring'), { scale: .8, autoAlpha: .8 }, { scale: 1.6, autoAlpha: 0, duration: 1.1, ease: 'power2.out' }, .7);
         nodes.forEach(function (n, i) {
@@ -1247,6 +1278,11 @@
       }
     }
   ];
+  /* Hoofdstuk Ontwerpen: verborgen tenzij TOON_ONTWERPEN true is of de link ?ontwerpen=1 bevat */
+  if (!ONTWERPEN) {
+    const iO = CH.findIndex(function (c) { return c.nav === 'Ontwerpen'; });
+    if (iO > -1) CH.splice(iO, 1);
+  }
 
   /* ---------- geometrie ---------- */
   function layout3(vis) {
@@ -1320,12 +1356,13 @@
   nextB.insertAdjacentHTML('beforeend', I.arrowR);
   prevB.insertAdjacentHTML('afterbegin', I.arrowL);
   skipB.insertAdjacentHTML('beforeend', I.close);
+  if (!ONTWERPEN) skipB.style.display = 'none';
 
   const scenes = CH.map(function (c, i) {
     const s = document.createElement('section');
     s.className = 'scene s' + (i + 1) + (c.dark ? ' dark' : '');
     s.setAttribute('aria-labelledby', 't' + (i + 1));
-    s.innerHTML = '<div class="inner"><div class="copy"><h2 class="ttl" id="t' + (i + 1) + '">' + words(c.title) + '</h2><p class="sub">' + c.sub + '</p></div><div class="vis"' + (c.a11y ? '' : ' aria-hidden="true"') + '></div></div>';
+    s.innerHTML = '<div class="inner"><div class="copy"><h2 class="ttl" id="t' + (i + 1) + '">' + words(c.title) + '</h2><p class="sub">' + c.sub + '</p>' + (c.copyX || '') + '</div><div class="vis"' + (c.a11y ? '' : ' aria-hidden="true"') + '></div></div>';
     s.inert = true;
     s.setAttribute('inert', '');
     stage.appendChild(s);
@@ -1339,7 +1376,7 @@
   });
   const fills = navBtns.map(function (b) { return b.querySelector('.pg-bar i'); });
 
-  let cur = 0, tl = null, extra = [];
+  let cur = 0, tl = null, extra = [], c1Go = null;
 
   function setFill(p) {
     fills.forEach(function (f, i) {
@@ -1355,7 +1392,7 @@
   }
   function resetPersist(sc) {
     if (!G) return;
-    G.set(qa(sc, '.ttl .w>span, .sub'), { clearProps: 'transform,opacity,visibility' });
+    G.set(qa(sc, '.ttl .w>span, .sub, .iso'), { clearProps: 'transform,opacity,visibility' });
     const c = sc.querySelector('.c3-c');
     if (c) G.set([c].concat(qa(c, '.c3-src, .trk, .sk i, iframe')), { clearProps: 'transform,opacity,visibility' });
   }
@@ -1365,6 +1402,7 @@
     n = Math.max(1, Math.min(CH.length, n | 0));
     if (n === cur && !o.force) return;
     const prevIdx = cur;
+    c1Go = null;
     stopAnims();
     if (introOn && n !== 1) endIntro(false);
     const inS = scenes[n - 1], outS = prevIdx && prevIdx !== n ? scenes[prevIdx - 1] : null, c = CH[n - 1];
@@ -1451,7 +1489,9 @@
   }
 
   /* ---------- bediening ---------- */
-  nextB.addEventListener('click', function () { goTo(cur + 1); });
+  /* verder: in hoofdstuk 1 eerst de prompt versturen, daarna pas naar 2 */
+  function forward() { if (cur === 1 && c1Go) { c1Go(); return; } goTo(cur + 1); }
+  nextB.addEventListener('click', forward);
   prevB.addEventListener('click', function () { goTo(cur - 1); });
   skipB.addEventListener('click', close);
   $('progList').addEventListener('click', function (e) {
@@ -1461,10 +1501,10 @@
   document.addEventListener('keydown', function (e) {
     if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key;
-    if (k === 'Escape') { e.preventDefault(); close(); return; }
+    if (k === 'Escape') { if (ONTWERPEN) { e.preventDefault(); close(); } return; }
     const onCtl = e.target && e.target.closest && e.target.closest('button, a, input, textarea, select');
     if ((k === ' ' || k === 'Enter') && onCtl) return;
-    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); goTo(cur + 1); }
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); forward(); }
     else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); goTo(cur - 1); }
     else if (k === 'Home') { e.preventDefault(); goTo(1); }
     else if (k === 'End') { e.preventDefault(); goTo(CH.length); }
